@@ -1,0 +1,507 @@
+/* ==================== GLOBAL & LAYOUT ==================== */
+body {
+    margin: 0;
+    background: linear-gradient(135deg, #1e1e2f, #2a2a35, #121212);
+    height: 100vh;
+    color: white;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    overscroll-behavior: none;
+    overflow: hidden;
+}
+
+.app-container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    height: calc(100vh - 40px);
+    box-sizing: border-box;
+}
+
+.left-sidebar {
+    width: 300px;
+    flex-shrink: 0;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.sidebar-header h2 {
+    margin: 0;
+}
+
+.add-note-btn {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: rgba(46, 204, 113, 0.2);
+    border: 1px solid rgba(46, 204, 113, 0.4);
+    color: #2ecc71;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.add-note-btn:hover {
+    background: rgba(46, 204, 113, 0.4);
+    transform: scale(1.1);
+}
+
+.chat-area {
+    flex-grow: 1;
+    min-width: 0;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ==================== UTILITIES ==================== */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+/* ==================== CHAT SYSTEM ==================== */
+.chat-history-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.message {
+    position: relative;
+    cursor: auto;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    border-radius: 15px;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.ai-message {
+    background: rgba(255, 255, 255, 0.1);
+    border-left: 4px solid #6495ED;
+    padding: 8px 12px;
+    border-radius: 7px;
+    max-width: 95%;
+    position: relative;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.ai-message p {
+    margin: 0;
+}
+
+.user-message {
+    background: rgba(255, 255, 255, 0.1);
+    align-self: flex-end;
+    border-right: 4px solid #4CAF50;
+    padding: 8px 12px;
+    border-radius: 7px;
+    max-width: 95%;
+    position: relative;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+/* ==================== AI CITATIONS ==================== */
+.sources-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.citation-chip {
+    background: rgba(255, 255, 255, 0.177);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.citation-chip:hover {
+    background: rgba(64, 149, 237, 0.2);
+    transform: translateY(-2px);
+}
+
+
+/* ==================== NOTE SYSTEM (SIDEBAR) ==================== */
+.notes-list-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.note-card {
+    position: relative;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 15px;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.note-preview {
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ==================== INPUT AREA ==================== */
+.input-area {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    align-items: center;
+}
+
+.input-area input,
+.input-area textarea {
+    flex-grow: 1;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    border-radius: 15px;
+    color: white;
+    font-size: 16px;
+    outline: none;
+    font-family: inherit;
+    resize: none;
+    box-sizing: border-box;
+}
+
+#user-input {
+    max-height: 150px;
+    overflow-y: hidden;
+    box-sizing: border-box;
+}
+
+/**/
+#user-input::-webkit-scrollbar {
+    width: 6px;
+}
+
+#user-input::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+#user-input::-webkit-scrollbar-track {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    background: transparent;
+}
+
+/* ==================== BUTTONS ==================== */
+.glass-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 10px 30px;
+    border-radius: 15px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.send-btn {
+    background: #6495ED;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.send-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.send-btn:hover {
+    background: #4178da;
+    transform: scale(1.1);
+}
+
+.send-btn:disabled {
+    background: rgba(255, 255, 255, 0.1);
+    cursor: not-allowed;
+}
+
+.modal-header {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#modal-title {
+    flex-grow: 1;
+}
+
+.glass-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.delete-btn {
+    position: absolute;
+    top: 12px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 18px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.delete-btn:hover {
+    color: #ff4c4c;
+}
+
+/* ==================== MODAL OVERLAY ==================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-content {
+    width: 600px;
+    max-width: 90vw;
+    max-height: 90vh; /* Allow more space but cap it */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal-input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 15px;
+    color: white;
+    font-size: 16px;
+    font-family: inherit;
+    outline: none;
+}
+
+#modal-textarea, .markdown-content {
+    height: 350px;
+    max-height: 40vh; /* Cap the textarea/preview height */
+    flex-shrink: 1;
+    resize: none;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* ==================== TAGS SYSTEM (UI CHIPS) ==================== */
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 0 5px;
+    align-items: center;
+}
+
+.tag-chip {
+    background: rgba(100, 149, 237, 0.15);
+    border: 1px solid rgba(100, 149, 237, 0.4);
+    color: #a3c2fa;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.tag-chip .remove-tag {
+    background: none;
+    border: none;
+    color: #6495ED;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.tag-chip .remove-tag:hover {
+    color: white;
+}
+
+.add-tag-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 18px;
+}
+
+.add-tag-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: white;
+    color: white;
+    transform: scale(1.05);
+}
+
+/* ==================== TAG DROPDOWN ==================== */
+.tag-dropdown {
+    background: #1e1e24;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 20px 0 rgba(0, 0, 0, 0.6);
+    transition: opacity 0.2s ease;
+}
+
+.tag-dropdown.hidden {
+    display: none;
+}
+
+#new-tag-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+    font-family: inherit;
+    transition: border 0.2s ease;
+}
+
+#new-tag-input:focus {
+    border-color: #6495ED;
+    outline: none;
+}
+
+.predefined-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.dropdown-tag {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #999;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dropdown-tag:hover {
+    background: rgba(100, 149, 237, 0.2);
+    color: white;
+}
+
+/* ==================== CONFIRM MODAL ==================== */
+.confirm-modal-content {
+    max-width: 320px;
+    text-align: center;
+    padding: 2.5rem 2rem;
+}
+
+.confirm-modal-content h3 {
+    margin-bottom: 1rem;
+    color: #fff;
+    font-size: 1.5rem;
+}
+
+.confirm-modal-content p {
+    margin-bottom: 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+}
+
+.confirm-modal-content .modal-actions {
+    justify-content: center;
+}
+
+.ok-btn {
+    background: rgba(231, 76, 60, 0.4) !important; /* Red for delete */
+}
+
+.ok-btn:hover {
+    background: rgba(231, 76, 60, 0.6) !important;
+}

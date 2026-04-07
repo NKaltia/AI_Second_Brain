@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>AI Second Brain</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <div class="left-sidebar glass-panel">
+            <div class="sidebar-header">
+                <h2>Notes🗓️</h2>
+                <button id="add-note-btn" class="add-note-btn" title="Create New Note">+</button>
+            </div>
+            <div id="notes-list" class="notes-list-container">
+                <!-- temp -->
+            </div>
+        </div>
+
+        <div class="chat-area glass-panel">
+            <h2>AI Assistant🤖</h2>
+            <div id="chat-history" class="chat-history-container">
+            </div>
+            <div class="input-area">
+                <textarea id="user-input" placeholder="Ask me anything..." rows="1" spellcheck="false"></textarea>
+                <button id="ask-btn" class="send-btn" title="Ask AI">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="note-modal" class="modal-overlay hidden">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <input type="text" id="modal-title" class="modal-input" placeholder="Title">
+            </div>
+            <textarea id="modal-textarea" class="modal-input" placeholder="Your note content..."></textarea>
+            <div id="modal-tags-container" class="tags-container">
+                <button id="add-tag-btn" class="add-tag-btn" title="Add Tag">+</button>
+            </div>
+            <div id="tag-dropdown" class="tag-dropdown hidden">
+                <input type="text" id="new-tag-input" placeholder="New tag name" autocomplete="off" maxlength="20">
+                <div class="predefined-tags">
+                    <span class="dropdown-tag">work</span>
+                    <span class="dropdown-tag">study</span>
+                    <span class="dropdown-tag">ideas</span>
+                    <span class="dropdown-tag">food</span>
+                    <span class="dropdown-tag">travel</span>
+                    <span class="dropdown-tag">leisure</span>
+                    <span class="dropdown-tag">ToDo</span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="modal-close-btn" class="glass-btn">Cancel</button>
+                <button id="modal-save-btn" class="glass-btn" style="background: rgba(46,204,113,0.4)">Save</button>
+            </div>
+        </div>
+    </div>
+    <div id="confirm-modal" class="modal-overlay hidden">
+        <div class="modal-content glass-panel confirm-modal-content">
+            <h3>Are you sure?</h3>
+            <p>Do you really want to delete this note?</p>
+            <div class="modal-actions">
+                <button id="confirm-cancel-btn" class="glass-btn">Cancel</button>
+                <button id="confirm-ok-btn" class="glass-btn ok-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

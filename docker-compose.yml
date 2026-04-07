@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  db:
+    # Используем готовый образ PostgreSQL с уже установленным плагином pgvector
+    image: ankane/pgvector:latest
+    container_name: ai_second_brain_db
+    restart: always
+    environment:
+      # Задаем параметры доступа к БД (логин, пароль, название базы)
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: second_brain_db
+    ports:
+      # Пробрасываем порт 5432 из контейнера на порт 5432 твоего ПК, 
+      # чтобы наш код на Node.js мог достучаться до базы данных
+      - "5432:5432"
+    volumes:
+      # Это магия Docker: мы привязываем папку внутри контейнера к "виртуальной" папке на твоем ПК.
+      # Благодаря этому, даже если ты удалишь контейнер, сами заметки (данные) не пропадут!
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
