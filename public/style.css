@@ -475,6 +475,41 @@ body {
     color: white;
 }
 
+/* ==================== AUTH MODAL ==================== */
+.auth-modal-content {
+    max-width: 400px;
+    text-align: center;
+}
+
+#auth-title, .auth-input {
+    margin-bottom: 20px;
+}
+
+.auth-actions {
+    flex-direction: column;
+    gap: 10px;
+}
+
+.auth-submit-btn {
+    background: rgba(46, 204, 113, 0.4);
+    width: 100%;
+}
+.auth-submit-btn:hover {
+    background: rgba(46, 204, 113, 0.6);
+}
+
+.auth-switch-btn {
+    width: 100%;
+    border: none;
+    font-size: 0.9em;
+    opacity: 0.8;
+    background: transparent;
+}
+.auth-switch-btn:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.1);
+}
+
 /* ==================== CONFIRM MODAL ==================== */
 .confirm-modal-content {
     max-width: 320px;

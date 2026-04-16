@@ -15,6 +15,15 @@ const confirmModal = document.getElementById('confirm-modal');
 const confirmOkBtn = document.getElementById('confirm-ok-btn');
 const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
 
+const authModal = document.getElementById('auth-modal');
+const authTitle = document.getElementById('auth-title');
+const authEmailInput = document.getElementById('auth-email');
+const authPasswordInput = document.getElementById('auth-password');
+const authActionButton = document.getElementById('auth-action-btn');
+const authSwitchButton = document.getElementById('auth-switch-btn');
+
+let isLoginMode = true;
+
 let currentEditingTags = [];
 let currentEditingNoteId = null;
 
@@ -100,7 +109,11 @@ function addMessageToChat(text, senderClass, sources = []) {
 
 async function loadNotes() {
     try {
-        const response = await fetch('/notes');
+        const response = await fetch('/notes', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
         if (!response.ok) {
             console.error('Network error');
             return;
@@ -174,7 +187,8 @@ askBtn.addEventListener('click', async () => {
         const response = await fetch('/ask', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
             body: JSON.stringify({ question: text, history: chatHistoryContext })
         });
@@ -243,7 +257,8 @@ modalSaveBtn.addEventListener('click', async () => {
         const response = await fetch(url, {
             method: method,
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
             body: JSON.stringify({ content: newContent, title: newTitle, tags: currentEditingTags })
         });
@@ -295,7 +310,6 @@ tagDropdown.addEventListener('click', (e) => {
     }
 });
 
-// Confirm Modal Events
 confirmCancelBtn.addEventListener('click', hideConfirmModal);
 confirmModal.addEventListener('click', (e) => {
     if (e.target === confirmModal) hideConfirmModal();
@@ -304,7 +318,12 @@ confirmModal.addEventListener('click', (e) => {
 confirmOkBtn.addEventListener('click', async () => {
     if (noteToDeleteId) {
         try {
-            await fetch('/notes/' + noteToDeleteId, { method: 'DELETE' });
+            await fetch('/notes/' + noteToDeleteId, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
             hideConfirmModal();
             loadNotes();
         } catch (err) {
@@ -313,4 +332,70 @@ confirmOkBtn.addEventListener('click', async () => {
     }
 });
 
-loadNotes();
+authSwitchButton.addEventListener('click', () => {
+    isLoginMode = !isLoginMode;
+    authTitle.textContent = isLoginMode ? 'Log in' : 'Sign Up';
+
+    if (isLoginMode) {
+        authActionButton.textContent = 'Log in';
+        authSwitchButton.textContent = 'Register';
+    }
+    else {
+        authActionButton.textContent = 'Sign Up';
+        authSwitchButton.textContent = 'Already have an account? Log in';
+    }
+});
+
+authActionButton.addEventListener('click', async () => {
+    const email = authEmailInput.value.trim();
+    const password = authPasswordInput.value.trim();
+
+    if (!email || !password) {
+        alert("Please enter email and password");
+        return;
+    }
+
+    const endpoint = isLoginMode ? '/auth/login' : '/auth/register';
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            if (isLoginMode) {
+                localStorage.setItem('token', data.token);
+                checkAuth();
+            } else {
+                alert("Registration successful! Please log in.");
+                authSwitchButton.click();
+            }
+        } else {
+            alert(data.error);
+        }
+    } catch (err) {
+        console.error("Auth error:", err);
+        alert("An error occurred during authentication");
+    }
+});
+
+
+function checkAuth() {
+    const token = localStorage.getItem('token');
+    if (token) {
+        authModal.classList.add('hidden');
+        loadNotes();
+    }
+    else {
+        authModal.classList.remove('hidden');
+    }
+}
+
+checkAuth();
