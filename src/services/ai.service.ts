@@ -31,7 +31,7 @@ export class AIService {
 
         try {
             const response = await this.ai.models.generateContent({
-                model: 'gemini-2.5-flash',
+                model: 'gemini-2.0-flash',
                 contents: [{ role: 'user', parts: [{ text: prompt }] }],
                 config: {
                     responseMimeType: 'application/json',
@@ -108,7 +108,7 @@ export class AIService {
         };
 
         const response = await this.ai.models.generateContent({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-2.0-flash',
             contents: [...formattedHistory, currentMessage],
             config: {
                 systemInstruction: systemInstuction,
