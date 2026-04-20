@@ -58,7 +58,7 @@ export class NoteService {
         const result = await prisma.$queryRaw<Note[]>`
         SELECT id, title, content, tags, "createdAt"
         FROM "Note"
-        WHERE "userId" = ${userId} AND embedding <=> ${queryVectorString}::vector < 0.2
+        WHERE "userId" = ${userId} AND embedding <=> ${queryVectorString}::vector < 0.35
         ORDER BY embedding <=> ${queryVectorString}::vector
         LIMIT 5;
         `;

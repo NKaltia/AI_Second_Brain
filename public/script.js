@@ -21,6 +21,7 @@ const authEmailInput = document.getElementById('auth-email');
 const authPasswordInput = document.getElementById('auth-password');
 const authActionButton = document.getElementById('auth-action-btn');
 const authSwitchButton = document.getElementById('auth-switch-btn');
+const authConfirmPasswordInput = document.getElementById('auth-confirm-password');
 
 let isLoginMode = true;
 
@@ -109,16 +110,7 @@ function addMessageToChat(text, senderClass, sources = []) {
 
 async function loadNotes() {
     try {
-        const response = await fetch('/notes', {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
-        if (!response.ok) {
-            console.error('Network error');
-            return;
-        }
-        const notesArray = await response.json();
+        const notesArray = await api.getNotes();
         const notesContainer = document.getElementById('notes-list');
         notesContainer.innerHTML = '';
 
@@ -184,26 +176,14 @@ askBtn.addEventListener('click', async () => {
     askBtn.disabled = true;
 
     try {
-        const response = await fetch('/ask', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify({ question: text, history: chatHistoryContext })
-        });
-        if (response.ok) {
-            const data = await response.json();
-            if (data.newNoteSaved) loadNotes();
-            addMessageToChat(data.answer, 'ai-message', data.sources);
-            chatHistoryContext.push({ role: 'user', content: text });
-            chatHistoryContext.push({ role: 'model', content: data.answer });
+        const data = await api.askAI(text, chatHistoryContext);
 
-            if (chatHistoryContext.length > 20) chatHistoryContext = chatHistoryContext.slice(-10);
-        } else {
-            addMessageToChat("Error, ai-message");
-            chatHistoryContext.pop();
-        }
+        if (data.newNoteSaved) loadNotes();
+        addMessageToChat(data.answer, 'ai-message', data.sources);
+        chatHistoryContext.push({ role: 'user', content: text });
+        chatHistoryContext.push({ role: 'model', content: data.answer });
+
+        if (chatHistoryContext.length > 20) chatHistoryContext = chatHistoryContext.slice(-10);
 
     } catch (err) {
         addMessageToChat("Error, ai-message");
@@ -251,25 +231,11 @@ modalSaveBtn.addEventListener('click', async () => {
     }
 
     try {
-        const method = currentEditingNoteId ? 'PUT' : 'POST';
-        const url = currentEditingNoteId ? '/notes/' + currentEditingNoteId : '/notes';
+        await api.saveNote(currentEditingNoteId, newTitle, newContent, currentEditingTags);
 
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify({ content: newContent, title: newTitle, tags: currentEditingTags })
-        });
-
-        if (response.ok) {
-            modalOverlay.classList.add('hidden');
-            currentEditingNoteId = null;
-            loadNotes();
-        } else {
-            alert("Failed to save note");
-        }
+        modalOverlay.classList.add('hidden');
+        currentEditingNoteId = null;
+        loadNotes();
     } catch (err) {
         console.log(err);
     } finally {
@@ -318,12 +284,7 @@ confirmModal.addEventListener('click', (e) => {
 confirmOkBtn.addEventListener('click', async () => {
     if (noteToDeleteId) {
         try {
-            await fetch('/notes/' + noteToDeleteId, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
+            await api.deleteNote(noteToDeleteId);
             hideConfirmModal();
             loadNotes();
         } catch (err) {
@@ -337,10 +298,12 @@ authSwitchButton.addEventListener('click', () => {
     authTitle.textContent = isLoginMode ? 'Log in' : 'Sign Up';
 
     if (isLoginMode) {
+        authConfirmPasswordInput.classList.add('hidden');
         authActionButton.textContent = 'Log in';
         authSwitchButton.textContent = 'Register';
     }
     else {
+        authConfirmPasswordInput.classList.remove('hidden');
         authActionButton.textContent = 'Sign Up';
         authSwitchButton.textContent = 'Already have an account? Log in';
     }
@@ -355,34 +318,39 @@ authActionButton.addEventListener('click', async () => {
         return;
     }
 
-    const endpoint = isLoginMode ? '/auth/login' : '/auth/register';
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        alert("Please enter a valid email address (e.g. user@gmail.com)");
+        return;
+    }
+
+    if (!isLoginMode) {
+        const confirmPassword = authConfirmPasswordInput.value.trim();
+        if (password !== confirmPassword) {
+            alert("Passwords do not match");
+            return;
+        }
+    }
+
+    if (!isLoginMode && password.length < 6) {
+        alert("Password must be at least 6 characters long.");
+        return;
+    }
 
     try {
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify({ email, password })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            if (isLoginMode) {
-                localStorage.setItem('token', data.token);
-                checkAuth();
-            } else {
-                alert("Registration successful! Please log in.");
-                authSwitchButton.click();
-            }
+        let data;
+        if (isLoginMode) {
+            data = await api.login(email, password);
+            localStorage.setItem('token', data.token);
+            checkAuth();
         } else {
-            alert(data.error);
+            data = await api.register(email, password);
+            alert("Registration successful! Please log in.");
+            authSwitchButton.click();
         }
     } catch (err) {
         console.error("Auth error:", err);
-        alert("An error occurred during authentication");
+        alert(err.message || "An error occurred during authentication");
     }
 });
 

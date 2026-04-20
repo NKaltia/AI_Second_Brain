@@ -7,7 +7,7 @@ const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 
-// Включаем логирование запросов, чтобы видеть магию SQL прямо в терминале!
+
 export const prisma = new PrismaClient({
     adapter,
     log: ['query', 'info', 'warn', 'error']

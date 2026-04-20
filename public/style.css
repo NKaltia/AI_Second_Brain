@@ -320,15 +320,11 @@ body {
     transition: opacity 0.3s ease;
 }
 
-.modal-overlay.hidden {
-    opacity: 0;
-    pointer-events: none;
-}
-
 .modal-content {
     width: 600px;
     max-width: 90vw;
-    max-height: 90vh; /* Allow more space but cap it */
+    max-height: 90vh;
+    /* Allow more space but cap it */
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -347,9 +343,11 @@ body {
     outline: none;
 }
 
-#modal-textarea, .markdown-content {
+#modal-textarea,
+.markdown-content {
     height: 350px;
-    max-height: 40vh; /* Cap the textarea/preview height */
+    max-height: 40vh;
+    /* Cap the textarea/preview height */
     flex-shrink: 1;
     resize: none;
 }
@@ -432,10 +430,6 @@ body {
     transition: opacity 0.2s ease;
 }
 
-.tag-dropdown.hidden {
-    display: none;
-}
-
 #new-tag-input {
     width: 100%;
     background: rgba(0, 0, 0, 0.3);
@@ -481,7 +475,8 @@ body {
     text-align: center;
 }
 
-#auth-title, .auth-input {
+#auth-title,
+.auth-input {
     margin-bottom: 20px;
 }
 
@@ -494,6 +489,7 @@ body {
     background: rgba(46, 204, 113, 0.4);
     width: 100%;
 }
+
 .auth-submit-btn:hover {
     background: rgba(46, 204, 113, 0.6);
 }
@@ -505,6 +501,7 @@ body {
     opacity: 0.8;
     background: transparent;
 }
+
 .auth-switch-btn:hover {
     opacity: 1;
     background: rgba(255, 255, 255, 0.1);
@@ -534,9 +531,14 @@ body {
 }
 
 .ok-btn {
-    background: rgba(231, 76, 60, 0.4) !important; /* Red for delete */
+    background: rgba(231, 76, 60, 0.4) !important;
+    /* Red for delete */
 }
 
 .ok-btn:hover {
     background: rgba(231, 76, 60, 0.6) !important;
+}
+
+.hidden {
+    display: none !important;
 }

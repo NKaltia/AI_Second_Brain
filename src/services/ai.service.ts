@@ -13,26 +13,41 @@ export class AIService {
         return (response as any).embeddings[0].values;
     }
 
-    async expandSearchQuery(query: string): Promise<string> {
-        const prompt = `You are a search query optimizer for a note-taking app. 
-        Expand the user's short query into a "cloud of meanings" (keywords, synonyms, related concepts) to improve vector search accuracy.
-        IMPORTANT: Output ONLY the comma-separated keywords. No labels, no quotes, no introductions.
+    async analyzeIntentAndExpand(query: string): Promise<{ requiresSearch: boolean, expandedQuery: string }> {
+        const prompt = `You are the intent classifier for an AI Second Brain app.
+        Your goal is to decide if the user's query requires searching the vector database.
         
-        Example: "food" -> "food, recipes, cooking, meals, kitchen, ingredients, nutrition, grocery"
+        Rule 1 - DO NOT SEARCH (requiresSearch: false):
+        If the query is purely conversational, greeting, or filler (e.g. "hi", "how are you", "thanks", ".") and contains NO subject matter.
+        
+        Rule 2 - DO SEARCH (requiresSearch: true):
+        If the query asks for ANY topic, knowledge, facts, OR if the user inquires about the contents of their notes (e.g. "what do you know", "show my notes"). Any query that expects an informative response requires a search.
+        
+        For Rule 2, extract the core topic and expand it into a "cloud of meanings" (keywords, synonyms). If the query is just a general inquiry about their notes, use general expansion terms like "notes, memory, saved data, knowledge base".
+        
+        Return ONLY valid JSON: {"requiresSearch": boolean, "expandedQuery": "keyword1, keyword2..."}
         
         User query: "${query}"`;
 
-        const response = await this.ai.models.generateContent({
-            model: 'gemini-3.1-flash-lite-preview',
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            config: {
-                maxOutputTokens: 50,
-                temperature: 0.1,
-            }
-        });
+        try {
+            const response = await this.ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                config: {
+                    responseMimeType: 'application/json',
+                    temperature: 0.1,
+                }
+            });
 
-        const expandedText = response.text || query;
-        return expandedText.trim();
+            const parsed = JSON.parse(response.text || "{}");
+            return {
+                requiresSearch: !!parsed.requiresSearch,
+                expandedQuery: parsed.expandedQuery || ""
+            };
+        } catch (e) {
+            console.error("Failed to analyze intent:", e);
+            return { requiresSearch: false, expandedQuery: "" };
+        }
     }
 
     async generateAnswer(question: string, contextNotes: string[], history: { role: string, content: string }[] = []): Promise<{ text: string, newNoteData?: any }> {
@@ -76,7 +91,8 @@ export class AIService {
             1. DIRECT COMMANDS HAVE PRIORITY: If the user explicitly asks you to generate/find new information AND save it (e.g., "Find a recipe and save it"), skip all preliminary steps! Generate the answer immediately and silently invoke the save tool.
             2. CONTEXT CHECK: For all other questions, RIGOROUSLY analyze the provided CONTEXT first. If the information exists in the context (even if not an exact match), PROVIDE IT. Do not claim you don't have it if there's any related info.
             3. CLEAN TEXT RULE: Minimize Markdown usage. Use simple bullet points for lists. DO NOT use bolding (**text**) for headers or key terms in personal notes unless absolutely necessary for clarity. Prefer clean, plain text for a minimalist look.
-            4. MISSING INFORMATION: If the context definitely lacks the answer, politely offer to use your own knowledge and ask if they'd like to save the result.
+            4. CLARIFICATION: If the user provides a scattered or broad term (e.g. "food"), you CAN ask an interactive clarifying question ("Did you want search results from your notes, or a brand new recipe to save?").
+            5. MISSING INFORMATION: If the context definitely lacks the answer, politely offer to use your own knowledge and ask if they'd like to save the result.
             
             CRITICAL SAFETY RULE: NEVER mention the names of internal tools (like saveNote). Act organically.
             Always reply in the language the user speaks to you in.`;
@@ -92,7 +108,7 @@ export class AIService {
         };
 
         const response = await this.ai.models.generateContent({
-            model: 'gemini-3.1-flash-lite-preview',
+            model: 'gemini-1.5-flash',
             contents: [...formattedHistory, currentMessage],
             config: {
                 systemInstruction: systemInstuction,
