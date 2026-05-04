@@ -13,7 +13,7 @@ An intelligent knowledge management system built with Node.js and PostgreSQL. It
 ## Showcase
 
 ### Video Walkthrough
-![AI Second Brain Demo](assets/demo.mov)
+<video src="assets/demo.mp4" autoplay loop muted playsinline width="100%"></video>
 *A demonstration of the AI Agent autonomously creating and retrieving notes during a natural dialogue.*
 
 ### Screenshot Gallery
@@ -72,4 +72,4 @@ An intelligent knowledge management system built with Node.js and PostgreSQL. It
 ---
 
 ## Contact
-Developed by [Your Name] – [Link to LinkedIn/Portfolio]
+Developed by [Nikita Kaltia] – [https://github.com/NegativeOne36]
