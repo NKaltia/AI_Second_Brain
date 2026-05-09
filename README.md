@@ -14,7 +14,10 @@ An intelligent knowledge management system built with Node.js and PostgreSQL. It
 ## Showcase
 
 ### Video Walkthrough
-<video src="assets/demo.mp4" autoplay loop muted playsinline width="100%"></video>
+
+
+https://github.com/user-attachments/assets/51ce94e2-e0f7-4a91-935d-01f7b144f59e
+
 *A demonstration of the AI Agent autonomously creating and retrieving notes during a natural dialogue.*
 
 ### Screenshot Gallery
