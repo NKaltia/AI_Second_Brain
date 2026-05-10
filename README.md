@@ -2,6 +2,12 @@
 
 An intelligent knowledge management system built with Node.js and PostgreSQL. It uses RAG (Retrieval-Augmented Generation) and semantic vector search to act as an extension of your own mind. 
 
+## Live Demo
+
+👉 [Open AI Second Brain](https://ai-second-brain-4cv0.onrender.com/)
+
+_The app is hosted on Render free tier, so the server may take ~20–30 seconds to wake up on first load._
+
 ## Key Capabilities
 - **Semantic Retrieval (RAG):** Powered by `pgvector` and Google Gemini embeddings to find information based on context and meaning rather than keywords.
 - **Dynamic Query Expansion:** Implements HyDE (Hypothetical Document Embeddings) logic to bridge the gap between user queries and stored knowledge.
