@@ -11,7 +11,7 @@ _The app is hosted on Render free tier, so the server may take ~20–30 seconds 
 ## Key Capabilities
 - **Semantic Retrieval (RAG):** Powered by `pgvector` and Google Gemini embeddings to find information based on context and meaning rather than keywords.
 - **Dynamic Query Expansion:** Implements HyDE (Hypothetical Document Embeddings) logic to bridge the gap between user queries and stored knowledge.
-- **Autonomous Note Capture:** An AI agent capable of identifying and saving critical insights from a conversation in real-time using Function Calling.
+- **Note Capture via Function Calling:** The AI can create and save notes directly from the chat when the user asks it to.
 - **Secure Authentication:** Protected user access with JWT (JSON Web Tokens) and secure password hashing.
 - **Modern UI:** Responsive, minimalist glassmorphism interface for focused knowledge work.
 
@@ -24,7 +24,7 @@ _The app is hosted on Render free tier, so the server may take ~20–30 seconds 
 
 https://github.com/user-attachments/assets/51ce94e2-e0f7-4a91-935d-01f7b144f59e
 
-*A demonstration of the AI Agent autonomously creating and retrieving notes during a natural dialogue.*
+*A demonstration of the AI assistant creating and retrieving notes during a natural dialogue.*
 
 ### Screenshot Gallery
 | Main Dashboard | Note Editor |
