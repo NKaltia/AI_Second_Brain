@@ -10,7 +10,7 @@ _The app is hosted on Render free tier, so the server may take ~20–30 seconds 
 
 ## Key Capabilities
 - **Semantic Retrieval (RAG):** Powered by `pgvector` and Google Gemini embeddings to find information based on context and meaning rather than keywords.
-- **Dynamic Query Expansion:** Implements HyDE (Hypothetical Document Embeddings) logic to bridge the gap between user queries and stored knowledge.
+- **Dynamic Query Expansion:** An LLM step classifies query intent and expands the query with related terms before vector search (Currently testing HyDE system).
 - **Note Capture via Function Calling:** The AI can create and save notes directly from the chat when the user asks it to.
 - **Secure Authentication:** Protected user access with JWT (JSON Web Tokens) and secure password hashing.
 - **Modern UI:** Responsive, minimalist glassmorphism interface for focused knowledge work.
