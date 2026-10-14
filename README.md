@@ -63,7 +63,7 @@ The application follows a standard layered architectural pattern to ensure separ
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/NegativeOne36/AI_Second_Brain.git
+   git clone https://github.com/NKaltia/AI_Second_Brain.git
    cd AI_Second_Brain
    ```
 
@@ -108,4 +108,4 @@ The application is designed to be cloud-native:
 ---
 
 ## Contact
-Developed by [Nikita Kaltia] – [https://github.com/NegativeOne36]
+Developed by [Nikita Kaltia] – [https://github.com/NKaltia]
