@@ -1,79 +1,90 @@
-# AI Second Brain - Roadmap & Справочник
+# AI Second Brain — Roadmap
 
-Этот файл — наша главная точка синхронизации между твоими Mac и Windows ПК. 
-Здесь мы отмечаем, что уже сделано, что мы делаем сейчас и что предстоит.
-Также здесь я буду оставлять мини-справки по технологиям, чтобы ты всегда мог подсмотреть, зачем мы их используем.
+Each milestone ends with a review session (mock interview) on the material it covered.
 
----
-
-## 🚀 Текущий статус проекта
-**Текущий Этап:** 2. Подключение БД к нашему коду
-**Текущий Подэтап:** Проверка созданного API. Сервис и роуты переписаны под Prisma, нужно запустить сервер и создать заметку через POST-запрос.
+**Current milestone:** M1 — Production hardening
 
 ---
 
-## 📚 Справочник технологий (Твой словарь)
+## Done so far
 
-👉 *Все термины, определения, HTML-теги и шпаргалки по CSS были бережно перенесены в новый отдельный файл `KNOWLEDGE.md` в корне проекта!*
-
----
-
-## 💻 Шпаргалка по терминалу (Часто используемые команды)
-*   `npm run dev` — запустить наш сервер на время разработки (он сам будет перезапускаться при изменении файлов).
-*   `npx tsc --noEmit` — проверить весь проект на наличие TypeScript-ошибок (красных подчеркиваний) без запуска сервера.
-*   `npx prisma generate` — пересоздать "переводчика" Призмы, если мы меняли чертеж в `schema.prisma` или перешли на другой ПК.
-*   `npx prisma migrate dev --name <имя>` — применить новый чертеж к реальной Базе Данных (где `<имя>` — любое понятное слово, например `add_tags`).
-*   `docker-compose up -d` — запустить контейнер с нашей Базой Данных в фоновом режиме.
-*   `docker ps` — посмотреть, какие Докер-контейнеры сейчас работают на компьютере.
+- Express + TypeScript server with a layered architecture (routes → controllers → services)
+- PostgreSQL via Prisma, local Postgres in Docker Compose, Neon in production
+- RAG pipeline: Gemini embeddings, pgvector cosine-similarity search scoped per user
+- Intent routing and query expansion before vector search
+- LLM function calling (`saveNote`) to create notes from chat
+- JWT authentication with bcrypt password hashing
+- Vanilla JS frontend; deployed on Render
+- Removed `any` types from Express handlers
 
 ---
 
-## 🗺️ План работ (Роадмап)
+## M0 — Housekeeping ✅
 
-### Этап 0: Базовый сервер (✅ Завершено)
-- [x] Инициализация проекта.
-- [x] Настройка TypeScript.
-- [x] Создание базового сервера на Express.
-- [x] Создание сервиса для работы с массивом в памяти (`note.service.ts`).
+- [x] Commit leftover typing changes
+- [x] Stop tracking `.DS_Store`
+- [x] Track this roadmap in git
 
-### Этап 1: Инфраструктура БД (✅ Завершено)
-- [x] Установка Docker на ПК / Mac.
-- [x] Оформление API ключа Gemini.
-- [x] Создание файла `docker-compose.yml` (он скажет Докеру, как именно запустить БД).
-- [x] Успешный запуск базы данных PostgreSQL в Docker-контейнере.
-- [x] Создание файла `.env` и настройка `DATABASE_URL`.
+## M1 — Production hardening
 
-### Этап 2: Подключение БД к нашему коду (✅ Завершено)
-- [x] Установка библиотеки Prisma (инструмент для работы с БД).
-- [x] Описание структуры таблицы для заметок (`schema.prisma`).
-- [x] Генерация Prisma Client (`npx prisma generate`) и подключение в `db.ts`.
-- [x] Решение проблем с типизацией Prisma и TypeScript.
-- [x] Переписывание `note.service.ts` — заменяем тестовый массив на реальные запросы в БД через Prisma.
-- [x] Подключение новых методов из `note.service` в наш `index.ts`.
-- [x] Проверка: создаем заметку через API, перезапускаем сервер, проверяем, что заметка осталась в базе.
+- [ ] Single config module: validate environment variables with Zod at startup (fail fast)
+- [ ] Remove the hardcoded JWT secret fallback
+- [ ] Set a new `JWT_SECRET` on Render
+- [ ] Centralized error handler: generic message to the client, details only in server logs (no `error.stack` in responses)
+- [ ] Same login error for unknown email and wrong password (prevents user enumeration)
+- [ ] Validate request bodies with Zod
+- [ ] 🎤 Review: configuration and secrets, JWT, error handling, input validation
 
-### Этап 3: Интеграция ИИ (Gemini & RAG) (✅ Завершено)
-- [x] Настройка базы данных под векторный поиск (`pgvector` + `Unsupported("vector(768)")`)
-- [x] Установка Google AI SDK (`@google/genai`).
-- [x] Написание сервиса ИИ (`src/services/ai.service.ts`): генерация текста и эмбеддингов.
-- [x] Обновление `NoteService`: при сохранении заметки генерируем и сохраняем вектор координат.
-- [x] Создание умного поиска: находим похожие заметки математически.
-- [x] Создание эндпоинта `POST /ask` для общения с ИИ.
+## M2 — Project walkthrough
 
-### Этап 4: Стабилизация API (✅ Завершено)
-- [x] Изучение блоков `try/catch`.
-- [x] Защита сервера от падений при некорректных данных или ошибках ИИ (`req.body` валидация).
+- [ ] Trace a request end to end: browser → route → controller → service → Gemini / Postgres → response
+- [ ] Explain the layered architecture and why each layer exists
+- [ ] Write down the tech debt list
+- [ ] 🎤 Review: architecture, data flow, RAG, embeddings, pgvector
 
-### Этап 5: Frontend (Веб-интерфейс) (⏳ В процессе)
-- [x] Настройка отдачи статики (`public` папка) через Express.
-- [x] Создание красивого окна чата и списка заметок (HTML/CSS).
-- [x] Написание логики во Frontend (`public/script.js`): подключение кнопок к локальному API с помощью `fetch`.
-- [x] Отрисовка списка заметок и окна истории чата из JavaScript (DOM-манипуляции).
-- [x] Реализация удаления заметок напрямую из UI (Бэкенд Prisma + Фронтенд).
+## M3 — Real HyDE and retrieval quality
 
-### Этап 6: Улучшение логики и UX (Полировка)
-- [ ] **МЫ ЗДЕСЬ (Выбор следующего шага):** Выбираем направление развития:
-  - Добавление плавных CSS-анимаций для появления элементов.
-  - Сохранение истории чата с ИИ в базу данных (чтобы диалог не пропадал при F5).
-  - Красивый рендеринг ответов ИИ (форматирование жирного текста, списков).
-  - Добавление ссылок на источники (чтобы ИИ показывал, из какой заметки он взял ответ).
+- [ ] Build a small evaluation set (questions → expected notes) and measure the current hit rate
+- [ ] Implement HyDE (embed a hypothetical answer instead of the query)
+- [ ] Measure again and compare
+- [ ] Decide whether to merge intent classification and HyDE generation into one LLM call (latency/cost vs. clarity), based on the numbers
+- [ ] Record the decision as an ADR
+- [ ] 🎤 Review: RAG, HyDE, retrieval evaluation, latency/cost/quality trade-offs
+
+## M4 — Proper authentication
+
+- [ ] Inline error messages in the UI instead of `alert()`
+- [ ] Tokens in httpOnly cookies instead of localStorage
+- [ ] Short-lived access token + refresh token
+- [ ] Sign in with Google (OAuth 2.0)
+- [ ] Rate limiting on login
+- [ ] 🎤 Review: auth flow end to end, cookies vs. localStorage, OAuth
+
+## M5 — Engineering practices and packaging
+
+- [ ] Tests for the main endpoints
+- [ ] CI with GitHub Actions (lint, type check, tests)
+- [ ] Accurate README
+- [ ] CV bullet points and a 2-minute project pitch
+- [ ] 🎤 Final review of the whole project
+
+## Next — Agent
+
+- [ ] More tools beyond `saveNote`
+- [ ] Agent loop: the model decides the next step on its own
+
+---
+
+## Terminal cheat sheet
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Run the dev server (restarts on file changes) |
+| `npx tsc --noEmit` | Type-check the whole project without building |
+| `npx prisma generate` | Regenerate the Prisma client after editing `schema.prisma` or switching machines |
+| `npx prisma migrate dev --name <name>` | Apply schema changes to the database as a new migration |
+| `docker-compose up -d` | Start the local database container in the background |
+| `docker ps` | List running containers |
+| `git pull --rebase` | Get remote commits and replay local unpushed commits on top |
+
+Two-machine rule: **start of session → `git pull`, end of session → `git push`.**
