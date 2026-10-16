@@ -92,9 +92,14 @@ moves up a tier (e.g. it came up in a real interview), say so.
 3. Update the roadmap checkboxes; note what's next.
 4. Remind him: commit and `git push`.
 
-**Milestone end:** each milestone in `ROADMAP.md` ends with 🎤 — a mock interview of 8–10 questions
-on what it covered, mixing "explain X", "why did you choose Y", and "what if Z breaks". Record gaps
-in the knowledge base.
+**Milestone end:** each milestone in `ROADMAP.md` ends with 🎤 — a mock interview. **You don't run
+it**: it happens in a separate mentoring chat, with an interviewer who didn't teach the material
+(like a real interview). Your job when the last task of a milestone is done:
+1. Tell Nikita the milestone is ready for the 🎤 review.
+2. Make sure the knowledge base has cards for every 🔴/🟡 concept of the milestone.
+3. Write a short milestone summary for the interviewer (in the Notion page «🧭 Контекст для Claude»,
+   section «Где мы сейчас», or as text if you have no Notion access): what was built, which concepts
+   were covered, where Nikita was confident and where he struggled.
 
 ## Knowledge base (Notion)
 
@@ -109,9 +114,9 @@ If you don't have Notion access, end the session with the proposed cards as text
 
 ## Deep dives
 
-For topics that need long, deep discussion (system design, a hard trade-off, career questions),
-Nikita may go to a separate mentoring chat. If a question clearly needs that depth and would derail
-the current task, suggest it.
+The separate mentoring chat is also where important topics get discussed in depth (system design,
+hard trade-offs, career questions). If a question clearly needs that depth and would derail the
+current task, suggest parking it for the milestone review.
 
 ## The plan
 
