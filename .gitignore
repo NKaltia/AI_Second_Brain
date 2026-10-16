@@ -2,7 +2,6 @@ node_modules
 dist
 .env
 /src/generated/prisma
-ROADMAP.md
 KNOWLEDGE.md
 .DS_Store
 
