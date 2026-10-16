@@ -1,8 +1,10 @@
 import { AuthService } from '../services/auth.service.js';
+import type { Request,Response } from 'express';
+import type { UserRequest } from '../interfaces/express.interface.js';
 
 const authService = new AuthService();
 
-export const register = async (req: any, res: any) => {
+export const register = async (req: Request, res: Response) => {
     try {
         const newUser = await authService.register(req.body);
         res.status(201).json(newUser);
@@ -11,7 +13,7 @@ export const register = async (req: any, res: any) => {
     }
 };
 
-export const login = async (req: any, res: any) => {
+export const login = async (req: Request, res: Response) => {
     try {
         const data = await authService.login(req.body);
         res.json(data);
