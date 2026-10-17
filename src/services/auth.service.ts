@@ -4,9 +4,9 @@ import jwt from 'jsonwebtoken';
 import type { AuthDto } from '../interfaces/auth.interface.js';
 import { NoteService } from './note.service.js';
 import { WELCOME_NOTE_TITLE, WELCOME_NOTE_CONTENT, WELCOME_NOTE_TAGS } from '../utils/templates.js';
+import { config } from '../config.js';
 
 export class AuthService {
-    private JWT_SECRET = process.env.JWT_SECRET || 'secret-key-36';
     private noteService = new NoteService();
 
     async register(data: AuthDto) {
@@ -42,7 +42,7 @@ export class AuthService {
 
         if (!isPasswordValid) throw new Error('Invalid password');
 
-        const token = jwt.sign({ userId: user.id, email: user.email }, this.JWT_SECRET, { expiresIn: '24h' });
+        const token = jwt.sign({ userId: user.id, email: user.email }, config.jwtSecret, { expiresIn: '24h' });
         return { token, user: { id: user.id, email: user.email } };
     }
 }

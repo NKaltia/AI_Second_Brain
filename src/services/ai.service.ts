@@ -1,8 +1,8 @@
 import { GoogleGenAI, Type } from '@google/genai';
-
+import { config } from '../config.js';
 
 export class AIService {
-    private ai = new GoogleGenAI({});
+    private ai = new GoogleGenAI({ apiKey: config.geminiApiKey });
 
     async generateEmbedding(text: string, taskType: string = 'RETRIEVAL_QUERY'): Promise<number[]> {
         const response = await this.ai.models.embedContent({

@@ -27,9 +27,9 @@ Each milestone ends with a review session (mock interview) on the material it co
 
 ## M1 — Production hardening
 
-- [ ] Single config module: validate environment variables with Zod at startup (fail fast)
-- [ ] Remove the hardcoded JWT secret fallback
-- [ ] Set a new `JWT_SECRET` on Render
+- [x] Single config module: validate environment variables with Zod at startup (fail fast)
+- [x] Remove the hardcoded JWT secret fallback
+- [x] Set a new `JWT_SECRET` on Render
 - [ ] Centralized error handler: generic message to the client, details only in server logs (no `error.stack` in responses)
 - [ ] Same login error for unknown email and wrong password (prevents user enumeration)
 - [ ] Validate request bodies with Zod

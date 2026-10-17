@@ -1,8 +1,7 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import type { UserRequest } from '../interfaces/express.interface.js';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'secret-key-36';
+import { config } from '../config.js';
 
 export const authMiddleware = (req: UserRequest, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
@@ -13,7 +12,7 @@ export const authMiddleware = (req: UserRequest, res: Response, next: NextFuncti
     }
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET) as {userId: string, email: string };
+        const decoded = jwt.verify(token, config.jwtSecret) as { userId: string, email: string };
         req.user = decoded;
         next();
     } catch (error) {
