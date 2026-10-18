@@ -2,19 +2,15 @@ import { AIService } from '../services/ai.service.js';
 import { NoteService } from '../services/note.service.js';
 import type { UserRequest } from '../interfaces/express.interface.js';
 import type { Response } from 'express';
-import { AppError } from '../utils/errors.js';
 import type { Note } from '../interfaces/note.interface.js';
+import { askBodySchema } from '../validation/schemas.js';
+import { parseBody } from '../validation/parse.js';
 
 const aiService = new AIService();
 const noteService = new NoteService();
 
 export const askQuestion = async (req: UserRequest, res: Response) => {
-    const question = req.body.question;
-    const history = req.body.history || [];
-
-    if (!question) {
-        throw new AppError(400, 'Question is required');
-    }
+    const { question, history } = parseBody(askBodySchema, req.body);
 
     const intentAnalysis = await aiService.analyzeIntentAndExpand(question);
     console.log(`Intent Analysis for "${question}":`, intentAnalysis);

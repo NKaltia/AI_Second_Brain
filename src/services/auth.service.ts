@@ -1,7 +1,7 @@
 import { prisma } from '../db.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import type { AuthDto } from '../interfaces/auth.interface.js';
+import type { AuthBody } from '../validation/schemas.js';
 import { NoteService } from './note.service.js';
 import { WELCOME_NOTE_TITLE, WELCOME_NOTE_CONTENT, WELCOME_NOTE_TAGS } from '../utils/templates.js';
 import { config } from '../config.js';
@@ -10,7 +10,7 @@ import { AppError } from '../utils/errors.js';
 export class AuthService {
     private noteService = new NoteService();
 
-    async register(data: AuthDto) {
+    async register(data: AuthBody) {
         const hashedPassword = await bcrypt.hash(data.password, 10);
         let user;
         try {
@@ -44,7 +44,7 @@ export class AuthService {
         return { id: user.id, email: user.email };
     }
 
-    async login(data: AuthDto) {
+    async login(data: AuthBody) {
         const user = await prisma.user.findUnique({
             where: { email: data.email }
         });

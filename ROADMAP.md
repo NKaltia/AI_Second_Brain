@@ -32,7 +32,7 @@ Each milestone ends with a review session (mock interview) on the material it co
 - [x] Set a new `JWT_SECRET` on Render
 - [x] Centralized error handler: generic message to the client, details only in server logs (no `error.stack` in responses)
 - [x] Same login error for unknown email and wrong password (prevents user enumeration)
-- [ ] Validate request bodies with Zod
+- [x] Validate request bodies with Zod
 - [ ] 🎤 Review: configuration and secrets, JWT, error handling, input validation
 
 ## M2 — Project walkthrough

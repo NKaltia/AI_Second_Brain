@@ -1,7 +1,8 @@
 import { NoteService } from '../services/note.service.js';
 import type { UserRequest } from '../interfaces/express.interface.js';
 import type { Response } from 'express';
-import { AppError } from '../utils/errors.js';
+import { createNoteBodySchema, updateNoteBodySchema } from '../validation/schemas.js';
+import { parseBody } from '../validation/parse.js';
 
 const noteService = new NoteService();
 
@@ -11,14 +12,10 @@ export const getAllNotes = async (req: UserRequest, res: Response) => {
 };
 
 export const createNote = async (req: UserRequest, res: Response) => {
-    const { content, title, tags } = req.body;
+    const { content, title, tags } = parseBody(createNoteBodySchema, req.body);
 
-    if (!content) {
-        throw new AppError(400, 'Content is required');
-    }
-
-    const finalTitle = title || (content.split('\n'))[0].trim().substring(0, 30);
-    const finalTags = tags || [];
+    const finalTitle = title || content.split('\n')[0]!.trim().substring(0, 30);
+    const finalTags = tags ?? [];
 
     const newNote = await noteService.addNote(finalTitle, content, finalTags, req.user!.userId);
     res.status(201).json(newNote);
@@ -26,15 +23,12 @@ export const createNote = async (req: UserRequest, res: Response) => {
 
 export const updateNote = async (req: UserRequest, res: Response) => {
     const id = req.params.id as string;
-    const content = req.body.content;
-    const title = req.body.title;
-    const tags = req.body.tags || [];
+    const { content, title, tags } = parseBody(updateNoteBodySchema, req.body);
 
-    if (!content) {
-        throw new AppError(400, 'Content is required');
-    }
+    const finalTitle = title || content.split('\n')[0]!.trim().substring(0, 30);
+    const finalTags = tags ?? [];
 
-    const updatedNote = await noteService.updateNote(id, title, content, tags, req.user!.userId);
+    const updatedNote = await noteService.updateNote(id, finalTitle, content, finalTags, req.user!.userId);
     res.status(200).json(updatedNote);
 };
 
