@@ -2,7 +2,7 @@
 
 Each milestone ends with a review session (mock interview) on the material it covered.
 
-**Current milestone:** M1 — Production hardening
+**Current milestone:** M1.5 — Observability and error-handling follow-ups
 
 ---
 
@@ -25,7 +25,7 @@ Each milestone ends with a review session (mock interview) on the material it co
 - [x] Stop tracking `.DS_Store`
 - [x] Track this roadmap in git
 
-## M1 — Production hardening
+## M1 — Production hardening ✅
 
 - [x] Single config module: validate environment variables with Zod at startup (fail fast)
 - [x] Remove the hardcoded JWT secret fallback
@@ -33,13 +33,29 @@ Each milestone ends with a review session (mock interview) on the material it co
 - [x] Centralized error handler: generic message to the client, details only in server logs (no `error.stack` in responses)
 - [x] Same login error for unknown email and wrong password (prevents user enumeration)
 - [x] Validate request bodies with Zod
-- [ ] 🎤 Review: configuration and secrets, JWT, error handling, input validation
+- [x] 🎤 Review: configuration and secrets, JWT, error handling, input validation
+
+## M1.5 — Observability and error-handling follow-ups
+
+Gaps found during the M1 review. Small milestone; its review is folded into the M2 review.
+
+**Observability — being able to find out what went wrong**
+- [ ] Separate Gemini API key for development, in its own Google Cloud project (quotas are per project)
+- [ ] Structured logging with `pino` + `pino-http` instead of `console.*`
+- [ ] Request ID for every request: in every log line and in error responses
+- [ ] Prisma query logging only in development
+- [ ] `GET /health` that also checks the database; set it as the Health Check Path on Render
+
+**Error handling — honest status codes**
+- [ ] Malformed JSON → 400 and too-large body → 413 (today both become 500)
+- [ ] Missing or someone else's note on update/delete → 404 (today: 500 on delete, empty 200 on update)
+- [ ] Check that the note exists before calling Gemini on update
 
 ## M2 — Project walkthrough
 
 - [ ] Trace a request end to end: browser → route → controller → service → Gemini / Postgres → response
 - [ ] Explain the layered architecture and why each layer exists
-- [ ] Write down the tech debt list
+- [ ] Write down the tech debt list (start from the M1 review findings in Notion)
 - [ ] 🎤 Review: architecture, data flow, RAG, embeddings, pgvector
 
 ## M3 — Real HyDE and retrieval quality
@@ -58,6 +74,9 @@ Each milestone ends with a review session (mock interview) on the material it co
 - [ ] Short-lived access token + refresh token
 - [ ] Sign in with Google (OAuth 2.0)
 - [ ] Rate limiting on login
+- [ ] Validate the JWT payload with Zod instead of a type assertion (`as`)
+- [ ] Constant-time login: compare against a dummy hash for unknown emails (timing attack)
+- [ ] Decide how registration handles an existing email (today `409` reveals it) and record it as an ADR
 - [ ] 🎤 Review: auth flow end to end, cookies vs. localStorage, OAuth
 
 ## M5 — Engineering practices and packaging

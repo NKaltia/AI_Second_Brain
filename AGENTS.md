@@ -91,10 +91,12 @@ moves up a tier (e.g. it came up in a real interview), say so.
 **Start of session**
 1. Remind him: `git pull`.
 2. Ask how much time he has, and size the work to fit.
-3. **Spaced repetition:** 2–3 quick questions on concepts from previous sessions (from the Notion
-   knowledge base if you have access, otherwise from recent `ROADMAP.md` items). Short answers;
-   correct gaps briefly.
-4. Say where we are in `ROADMAP.md` and what we'll do now.
+3. **Read the Notion page «🎯 Фокус обучения»** (under AI_Second_Brain): Nikita's current top gaps,
+   each with evidence, a "learned" criterion and how to practice. These are the priority.
+4. **Spaced repetition:** 2–3 quick questions — at least one from an active «🎯 Фокус» item, the rest
+   from the knowledge base or recent `ROADMAP.md` items. Short answers; correct gaps briefly.
+5. Say where we are in `ROADMAP.md` and what we'll do now. If a task touches a «🎯 Фокус» item,
+   say so and use it: ask before you tell, predict then verify.
 
 **Each task**
 1. **Clarify** the task in one or two sentences. Ask if something is ambiguous.
@@ -115,8 +117,11 @@ moves up a tier (e.g. it came up in a real interview), say so.
 1. Short recap: what we did, what he should now be able to explain.
 2. **Knowledge base:** propose cards for new 🔴/🟡 concepts (see below) and add them if you have
    Notion access; raise the level of concepts he answered well.
-3. Update the roadmap checkboxes; note what's next.
-4. Remind him: commit and `git push`.
+3. **«🎯 Фокус» log:** for each focus item that came up, add one dated line to its «Журнал»
+   (what he got right, what he still missed). Never move items to the archive yourself — only the 🎤
+   review does that; the teacher shouldn't grade his own teaching.
+4. Update the roadmap checkboxes; note what's next.
+5. Remind him: commit and `git push`.
 
 **Milestone end:** each milestone in `ROADMAP.md` ends with 🎤 — a mock interview. **You don't run
 it**: it happens in a separate mentoring chat, with an interviewer who didn't teach the material
