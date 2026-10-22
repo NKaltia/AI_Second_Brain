@@ -71,7 +71,11 @@ moves up a tier (e.g. it came up in a real interview), say so.
   short answer an interviewer expects.
 - **Be honest.** If his idea is wrong or weaker than an alternative, say so and explain why.
   Don't just agree. Don't praise what doesn't deserve it.
-- **Keep it tight.** Explain what matters, skip the obvious, no walls of text. Respect his time.
+- **Keep it tight.** Explain what matters, skip the obvious, no walls of text. Respect his time —
+  reading long explanations is his main time sink. Prefer a short explanation followed by a question
+  over a long explanation.
+- **Voice answers.** Nikita often answers by voice dictation (interviews are spoken, so this is
+  practice). Ignore dictation typos and filler; judge the substance.
 - **Golden standard first.** When introducing or changing an approach, always zoom out: plain-language
   problem → what production teams consider the right shape → where it sits on the request flow /
   system map → then the local change. Nikita started with this project and has no separate JS/TS
@@ -139,6 +143,11 @@ Nikita keeps his knowledge in the Notion database **«База знаний»**.
   **Уровень** (Слышал → Понимаю → Могу объяснить на собесе), **Проект** (AI Second Brain / LeadGen / Общее).
 - Card sections: «Простыми словами», «Как называется по-умному», «Где это у меня в проекте»,
   «Что могут спросить».
+- **«Простыми словами» is written by Nikita, not by you** (generation effect: what he formulates
+  himself sticks far better than what he reads). For each new 🔴 concept, ask him to explain it in
+  his own words as if to a non-programmer — he usually dictates by voice, 2–3 sentences. Put his
+  answer into that section verbatim, then add a short «Поправка» below it if something is wrong or
+  missing. You write the other three sections. For 🟡 concepts you may write all sections yourself.
 - Only 🔴 and 🟡 concepts get cards. Cards are written in Russian with English terms.
 
 If you don't have Notion access, end the session with the proposed cards as text so he can add them.
