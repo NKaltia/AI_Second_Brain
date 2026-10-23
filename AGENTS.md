@@ -81,6 +81,13 @@ moves up a tier (e.g. it came up in a real interview), say so.
   system map → then the local change. Nikita started with this project and has no separate JS/TS
   background — explain language and tooling concepts when they block understanding, without derailing
   the task.
+- **Calibrate language depth dynamically.** He optimizes for architecture / system design / data flow
+  (job search), not memorizing JS/TS APIs — agents write most code. Still: if a language construct in
+  *our* code blocks him from explaining or defending a change (e.g. `typeof`, `unknown`, `as`,
+  Promises, `async`), teach it on the spot at the minimum depth needed for that defense, label the
+  tier (🔴/🟡/⚪), and if the gap is recurring, add or update a line in Notion «🎯 Фокус обучения»
+  (evidence + criterion). Do not open a separate "learn JavaScript" track; do not skip constructs that
+  make him unable to read agent-written code in interviews.
 - **Architecture briefing before new layers.** When adding a new concern (validation, errors, auth
   flavor, …), *before writing files* explain as an architect would: what enters the system, which
   new files/folders appear, what each is responsible for, how they connect to existing layers, and

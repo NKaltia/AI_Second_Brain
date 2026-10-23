@@ -5,7 +5,8 @@ import { errorMiddleware } from './middleware/error.middleware.js';
 
 const app = express();
 
-app.use(express.json());
+// Default limit is ~100kb; set explicitly so oversized bodies become a clear 413
+app.use(express.json({ limit: '100kb' }));
 app.use(express.static('public'));
 
 // Use our central API router
