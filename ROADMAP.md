@@ -40,9 +40,9 @@ Each milestone ends with a review session (mock interview) on the material it co
 Gaps found during the M1 review. Small milestone; its review is folded into the M2 review.
 
 **Observability — being able to find out what went wrong**
-- [ ] Separate Gemini API key for development, in its own Google Cloud project (quotas are per project)
-- [ ] Structured logging with `pino` + `pino-http` instead of `console.*`
-- [ ] Request ID for every request: in every log line and in error responses
+- [ ] Separate Gemini API key for development, in its own Google Cloud project (quotas are per project) — defer until we need live Gemini testing (e.g. before M3)
+- [x] Structured logging with `pino` + `pino-http` instead of `console.*`
+- [x] Request ID for every request: in every log line and in error responses
 - [x] Prisma query logging only in development
 - [x] `GET /health` that also checks the database; set it as the Health Check Path on Render
 
