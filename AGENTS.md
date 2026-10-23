@@ -123,6 +123,9 @@ moves up a tier (e.g. it came up in a real interview), say so.
    then correct or deepen it.
 8. **Commit:** suggest a Conventional Commits message (`feat:`, `fix:`, `refactor:`, `chore:`,
    `docs:`, `test:`), one logical change per commit. Nikita reviews the diff and commits himself.
+   Edits to this file (`AGENTS.md`) may accumulate and be committed once at **session end** as
+   `docs: calibrate mentoring rules` (or similar) — not as a separate commit after every tweak —
+   and should stay separate from feature/fix commits.
 
 **End of session**
 1. Short recap: what we did, what he should now be able to explain.
