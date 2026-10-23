@@ -47,7 +47,7 @@ Gaps found during the M1 review. Small milestone; its review is folded into the 
 - [ ] `GET /health` that also checks the database; set it as the Health Check Path on Render
 
 **Error handling — honest status codes**
-- [ ] Malformed JSON → 400 and too-large body → 413 (today both become 500)
+- [x] Malformed JSON → 400 and too-large body → 413 (today both become 500)
 - [ ] Missing or someone else's note on update/delete → 404 (today: 500 on delete, empty 200 on update)
 - [ ] Check that the note exists before calling Gemini on update
 

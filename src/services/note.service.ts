@@ -1,6 +1,7 @@
 import { prisma } from '../db.js';
 import type { Note } from '../interfaces/note.interface.js';
 import { AIService } from './ai.service.js';
+import { AppError } from '../utils/errors.js';
 
 export class NoteService {
     private aiService = new AIService();
@@ -33,12 +34,17 @@ export class NoteService {
     }
 
     async deleteNote(id: string, userId: string): Promise<void> {
+        const note = await this.getNoteById(userId, id);
+        if(!note) throw new AppError(404, 'Note not found');
         await prisma.note.delete({
             where: { userId, id }
         });
     }
 
     async updateNote(id: string, title: string, content: string, tags: string[], userId: string): Promise<Note> {
+        const note = await this.getNoteById(userId, id);
+        if(!note) throw new AppError(404, 'Note not found');
+
         const textToEmbed = `TITLE: ${title}\nTAGS: ${tags.join(', ')}\n\nCONTENT: ${content}\n\nKEYWORDS: ${title}, ${tags.join(', ')}`;
         const embeddingArray = await this.aiService.generateEmbedding(textToEmbed, 'RETRIEVAL_DOCUMENT');
         const queryVectorString = JSON.stringify(embeddingArray);
@@ -62,6 +68,11 @@ export class NoteService {
         ORDER BY embedding <=> ${queryVectorString}::vector
         LIMIT 5;
         `;
+        return result;
+    }
+
+    async getNoteById(userId: string, id: string): Promise<Note | null> {
+        const result = await prisma.note.findFirst({where: {id, userId}});
         return result;
     }
 }
