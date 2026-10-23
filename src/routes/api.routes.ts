@@ -3,10 +3,12 @@ import { authMiddleware } from '../middleware/auth.middleware.js';
 import * as authController from '../controllers/auth.controller.js';
 import * as noteController from '../controllers/note.controller.js';
 import * as aiController from '../controllers/ai.controller.js';
+import * as healthController from '../controllers/health.controller.js';
 
 const router = Router();
 
 // Auth routes (public)
+router.get('/health', healthController.healthCheck);
 router.post('/auth/register', authController.register);
 router.post('/auth/login', authController.login);
 
