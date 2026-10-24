@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx prisma generate &&tsc",
+    "build": "npx prisma generate && tsc",
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts"
   },
@@ -22,22 +22,20 @@
   },
   "homepage": "https://github.com/NegativeOne36/AI_Second_Brain#readme",
   "devDependencies": {
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0"
+  },
+  "dependencies": {
+    "@google/genai": "^1.44.0",
+    "@prisma/adapter-pg": "^7.4.2",
+    "@prisma/client": "^7.4.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.3.2",
     "@types/pg": "^8.18.0",
-    "nodemon": "^3.1.14",
-    "prisma": "^7.4.2",
-    "ts-node": "^10.9.2",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "@google/genai": "^1.44.0",
-    "@prisma/adapter-pg": "^7.4.2",
-    "@prisma/client": "^7.4.2",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
@@ -45,6 +43,8 @@
     "pg": "^8.19.0",
     "pino": "^10.4.0",
     "pino-http": "^11.0.0",
+    "prisma": "^7.4.2",
+    "typescript": "^5.9.3",
     "zod": "^4.6.7"
   }
 }

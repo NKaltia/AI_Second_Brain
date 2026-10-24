@@ -2,7 +2,7 @@
 
 Each milestone ends with a review session (mock interview) on the material it covered.
 
-**Current milestone:** M1.5 — Observability and error-handling follow-ups
+**Current milestone:** M2 — Project walkthrough
 
 ---
 
