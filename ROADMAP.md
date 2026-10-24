@@ -2,7 +2,7 @@
 
 Each milestone ends with a review session (mock interview) on the material it covered.
 
-**Current milestone:** M2 — Project walkthrough
+**Current milestone:** M2 — ready for 🎤 (walkthrough done; review pending)
 
 ---
 
@@ -53,10 +53,18 @@ Gaps found during the M1 review. Small milestone; its review is folded into the 
 
 ## M2 — Project walkthrough
 
-- [ ] Trace a request end to end: browser → route → controller → service → Gemini / Postgres → response
-- [ ] Explain the layered architecture and why each layer exists
-- [ ] Write down the tech debt list (start from the M1 review findings in Notion)
+- [x] Trace a request end to end: browser → route → controller → service → Gemini / Postgres → response
+- [x] Explain the layered architecture and why each layer exists
+- [x] Write down the tech debt list (start from the M1 review findings in Notion)
 - [ ] 🎤 Review: architecture, data flow, RAG, embeddings, pgvector
+
+### Tech debt (tracked; not blocking M2 🎤)
+
+- [ ] Log `AppError` 4xx as `warn` (not `error`); keep 5xx as `error`
+- [ ] UI: replace `alert()` + fix post-register redirect / auto-login (see M4)
+- [ ] Separate Gemini API key for local vs production (M1.5, deferred until live AI tests)
+- [ ] Remaining `console.*` in AI/controllers vs pino (noise / consistency)
+- [ ] Render: confirm Health Check Path is `/health` on the service
 
 ## M3 — Real HyDE and retrieval quality
 
