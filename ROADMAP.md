@@ -2,7 +2,9 @@
 
 Each milestone ends with a review session (mock interview) on the material it covered.
 
-**Current milestone:** M2 — ready for 🎤 (walkthrough done; review pending)
+**Current milestone:** MVP 2.0 — polish and freeze (~2 weeks, then stop feature work)
+
+Context (28.10.2026): semester + diploma project. Goal — a demo/CV-ready app, each step shippable on its own. Teaching stays per `AGENTS.md`, but only topics marked 🔴 get the deep loop.
 
 ---
 
@@ -11,11 +13,13 @@ Each milestone ends with a review session (mock interview) on the material it co
 - Express + TypeScript server with a layered architecture (routes → controllers → services)
 - PostgreSQL via Prisma, local Postgres in Docker Compose, Neon in production
 - RAG pipeline: Gemini embeddings, pgvector cosine-similarity search scoped per user
-- Intent routing and query expansion before vector search
+- Intent routing and query expansion before vector search (README still says “HyDE” — that is query expansion, not real HyDE)
 - LLM function calling (`saveNote`) to create notes from chat
 - JWT authentication with bcrypt password hashing
 - Vanilla JS frontend; deployed on Render
-- Removed `any` types from Express handlers
+- M1 production hardening (config fail-fast, AppError, Zod bodies, anti-enumeration on login)
+- M1.5 observability (pino + request IDs, `/health`, honest 400/413/404)
+- M2 walkthrough + 🎤 (~5.0/10) — see Notion «Где мы сейчас»
 
 ---
 
@@ -30,75 +34,71 @@ Each milestone ends with a review session (mock interview) on the material it co
 - [x] Single config module: validate environment variables with Zod at startup (fail fast)
 - [x] Remove the hardcoded JWT secret fallback
 - [x] Set a new `JWT_SECRET` on Render
-- [x] Centralized error handler: generic message to the client, details only in server logs (no `error.stack` in responses)
+- [x] Centralized error handler: generic message to the client, details only in server logs
 - [x] Same login error for unknown email and wrong password (prevents user enumeration)
 - [x] Validate request bodies with Zod
 - [x] 🎤 Review: configuration and secrets, JWT, error handling, input validation
 
-## M1.5 — Observability and error-handling follow-ups
+## M1.5 — Observability and error-handling follow-ups ✅
 
-Gaps found during the M1 review. Small milestone; its review is folded into the M2 review.
-
-**Observability — being able to find out what went wrong**
-- [ ] Separate Gemini API key for development, in its own Google Cloud project (quotas are per project) — defer until we need live Gemini testing (e.g. before M3)
-- [x] Structured logging with `pino` + `pino-http` instead of `console.*`
-- [x] Request ID for every request: in every log line and in error responses
+- [ ] Separate Gemini API key for development (moved into MVP 2.0 §1 — do with Google Cloud / OAuth setup)
+- [x] Structured logging with `pino` + `pino-http`
+- [x] Request ID on every request (logs + error responses)
 - [x] Prisma query logging only in development
-- [x] `GET /health` that also checks the database; set it as the Health Check Path on Render
+- [x] `GET /health` with DB ping
+- [x] Malformed JSON → 400; too-large body → 413
+- [x] Missing / someone else's note on update/delete → 404
+- [x] Check note exists before calling Gemini on update
 
-**Error handling — honest status codes**
-- [x] Malformed JSON → 400 and too-large body → 413 (today both become 500)
-- [x] Missing or someone else's note on update/delete → 404 (today: 500 on delete, empty 200 on update)
-- [x] Check that the note exists before calling Gemini on update
+## M2 — Project walkthrough ✅
 
-## M2 — Project walkthrough
+- [x] Trace a request end to end
+- [x] Explain layered architecture
+- [x] Tech debt list
+- [x] 🎤 Review (24.10.2026, ~5.0/10): architecture, data flow, RAG, embeddings, pgvector
 
-- [x] Trace a request end to end: browser → route → controller → service → Gemini / Postgres → response
-- [x] Explain the layered architecture and why each layer exists
-- [x] Write down the tech debt list (start from the M1 review findings in Notion)
-- [ ] 🎤 Review: architecture, data flow, RAG, embeddings, pgvector
+---
 
-### Tech debt (tracked; not blocking M2 🎤)
+## MVP 2.0 — Polish and freeze
 
-- [ ] Log `AppError` 4xx as `warn` (not `error`); keep 5xx as `error`
-- [ ] UI: replace `alert()` + fix post-register redirect / auto-login (see M4)
-- [ ] Separate Gemini API key for local vs production (M1.5, deferred until live AI tests)
-- [ ] Remaining `console.*` in AI/controllers vs pino (noise / consistency)
-- [ ] Render: confirm Health Check Path is `/health` on the service
+Every checkbox should be deployable alone. Order = risk × CV value.
 
-## M3 — Real HyDE and retrieval quality
+### Part 1 — Demo works and is safe
 
-- [ ] Build a small evaluation set (questions → expected notes) and measure the current hit rate
-- [ ] Implement HyDE (embed a hypothetical answer instead of the query)
-- [ ] Measure again and compare
-- [ ] Decide whether to merge intent classification and HyDE generation into one LLM call (latency/cost vs. clarity), based on the numbers
-- [ ] Record the decision as an ADR
-- [ ] 🎤 Review: RAG, HyDE, retrieval evaluation, latency/cost/quality trade-offs
+- [ ] **1. Models (do first).** Replace preview chat model with stable GA; centralize IDs; ADR for keeping embeddings. Verify `/ask` after deploy. Create a separate **dev** Gemini key in its own Google Cloud project (still open).
+  - [x] Code: `gemini-3.5-flash-lite` + `src/gemini-models.ts` + ADR 001 (embeddings unchanged)
+  - [ ] Smoke `/ask` locally and on Render after push
+  - [ ] Separate dev Gemini API key (Google Cloud project)
+- [ ] **2. 🔴 XSS.** Prove locally (`marked.parse` / note cards → `innerHTML`), then DOMPurify / `textContent`, re-test. Prompt injection → XSS story for interviews.
+- [ ] **3. UI without `alert()`.** Inline form errors + toasts; loading states; register → logged in; on 5xx show `requestId`.
+- [ ] **4. 🔴 Architecture debt from 🎤 M2.** `AskService` orchestration; Zod for tool-call args (no `as any`); intent errors → pino `warn` + requestId (not silent swallow); remaining `console.*` → pino; AppError 4xx → `warn`, 5xx → `error`.
+- [ ] **5. 🔴 Rate limiting.** `/auth/*` and `/ask` → 429. Explain why in-memory limits fail with multiple instances.
 
-## M4 — Proper authentication
+### Part 2 — Real auth (highest value)
 
-- [ ] Inline error messages in the UI instead of `alert()`
-- [ ] Tokens in httpOnly cookies instead of localStorage
-- [ ] Short-lived access token + refresh token
-- [ ] Sign in with Google (OAuth 2.0)
-- [ ] Rate limiting on login
-- [ ] Validate the JWT payload with Zod instead of a type assertion (`as`)
-- [ ] Constant-time login: compare against a dummy hash for unknown emails (timing attack)
-- [ ] Decide how registration handles an existing email (today `409` reveals it) and record it as an ADR
-- [ ] 🎤 Review: auth flow end to end, cookies vs. localStorage, OAuth
+Theory already covered in desktop Claude («JWT изнутри») — ask, don’t re-lecture from zero.
 
-## M5 — Engineering practices and packaging
+- [ ] **6. 🔴 Cookies + access/refresh.** Access ~15m; refresh hashed in DB; httpOnly cookies; `/auth/refresh` with rotation + reuse detection; `/auth/logout`; frontend silent refresh on 401; drop `localStorage` token. Also: `algorithms: ['HS256']`; Zod JWT payload; constant-time login; register-409 → ADR. “Attack yourself”: old refresh after rotation revokes chain.
+- [ ] **7. 🔴 Google OAuth 2.0 (required, after §6).** Our access/refresh after Google login; Auth Code + `state` (+ PKCE 🟡); verify ID token; Cloud Console redirect URIs; secrets via `config` / `.env.example`. ADR: linking Google email to existing password account. Schema: nullable `password`, `googleId` via expand → migrate → contract (check `DATABASE_URL` first).
+- [ ] **8. Guest “Try demo”** — only if time left. Per-visitor temp account with seed notes (not one shared account).
 
-- [ ] Tests for the main endpoints
-- [ ] CI with GitHub Actions (lint, type check, tests)
-- [ ] Accurate README
-- [ ] CV bullet points and a 2-minute project pitch
-- [ ] 🎤 Final review of the whole project
+### Part 3 — Packaging and freeze
 
-## Next — Agent
+- [ ] **9. Tests + CI.** Vitest + supertest (auth refresh/reuse, notes 404, 400/413; Gemini mocked). GitHub Actions: `tsc` + tests.
+- [ ] **10. README + ADRs.** Honest README (query expansion ≠ HyDE; architecture; Security; cold start). ADRs: refresh vs sessions; OAuth account linking; model choice / keep embeddings.
+- [ ] **11. Freeze checklist.** Full `.env.example`; Render Health Check Path `/health`; no soon-deprecated models; free-tier limits checked; manual demo path register → ask.
+- [ ] **12. 🎤 Final review** (desktop Claude) + CV bullets + pitch. Agent writes interviewer summary in Notion «Где мы сейчас» first.
 
-- [ ] More tools beyond `saveNote`
-- [ ] Agent loop: the model decides the next step on its own
+---
+
+## After the freeze (explicitly not now)
+
+- Real HyDE + evaluation set / hit-rate measurement
+- HNSW (or other ANN) index on `embedding` (+ `userId` index check)
+- More agent tools (update/delete) + prompt-injection defenses + human-in-the-loop for delete
+- Server-side chat history
+- Switch embedding model (full re-embed)
+- Broader OWASP Top 10 security review
 
 ---
 

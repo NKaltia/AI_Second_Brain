@@ -1,14 +1,19 @@
 import { GoogleGenAI, Type } from '@google/genai';
 import { config } from '../config.js';
+import {
+    GEMINI_CHAT_MODEL,
+    GEMINI_EMBEDDING_DIMENSIONS,
+    GEMINI_EMBEDDING_MODEL,
+} from '../gemini-models.js';
 
 export class AIService {
     private ai = new GoogleGenAI({ apiKey: config.geminiApiKey });
 
     async generateEmbedding(text: string, taskType: string = 'RETRIEVAL_QUERY'): Promise<number[]> {
         const response = await this.ai.models.embedContent({
-            model: 'gemini-embedding-001',
+            model: GEMINI_EMBEDDING_MODEL,
             contents: text,
-            config: { taskType: taskType, outputDimensionality: 768 }
+            config: { taskType: taskType, outputDimensionality: GEMINI_EMBEDDING_DIMENSIONS }
         });
         return (response as any).embeddings[0].values;
     }
@@ -31,7 +36,7 @@ export class AIService {
 
         try {
             const response = await this.ai.models.generateContent({
-                model: 'gemini-3.1-flash-lite-preview',
+                model: GEMINI_CHAT_MODEL,
                 contents: [{ role: 'user', parts: [{ text: prompt }] }],
                 config: {
                     responseMimeType: 'application/json',
@@ -108,7 +113,7 @@ export class AIService {
         };
 
         const response = await this.ai.models.generateContent({
-            model: 'gemini-3.1-flash-lite-preview',
+            model: GEMINI_CHAT_MODEL,
             contents: [...formattedHistory, currentMessage],
             config: {
                 systemInstruction: systemInstuction,
