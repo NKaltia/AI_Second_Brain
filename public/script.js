@@ -1,3 +1,4 @@
+const appContainer = document.querySelector('.app-container');
 const addNoteBtn = document.getElementById("add-note-btn");
 const inputField = document.getElementById('user-input');
 const askBtn = document.getElementById('ask-btn');
@@ -25,6 +26,7 @@ const authConfirmPasswordInput = document.getElementById('auth-confirm-password'
 const authFormError = document.getElementById('auth-form-error');
 const noteFormError = document.getElementById('note-form-error');
 const toastEl = document.getElementById('toast');
+const logoutBtn = document.getElementById('logout-btn');
 
 let isLoginMode = true;
 let toastTimer = null;
@@ -405,11 +407,25 @@ function checkAuth() {
     const token = localStorage.getItem('token');
     if (token) {
         authModal.classList.add('hidden');
+        appContainer.classList.remove('hidden');
         loadNotes();
     }
     else {
+        // Hide the app shell so login is not a blur over notes/chat
+        appContainer.classList.add('hidden');
         authModal.classList.remove('hidden');
     }
 }
+
+logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('token');
+    chatHistoryContext = [];
+    chatHistory.replaceChildren();
+    setFormError(authFormError, '');
+    authEmailInput.value = '';
+    authPasswordInput.value = '';
+    authConfirmPasswordInput.value = '';
+    checkAuth();
+});
 
 checkAuth();

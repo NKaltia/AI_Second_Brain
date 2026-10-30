@@ -20,14 +20,22 @@
         </div>
 
         <div class="chat-area glass-panel">
-            <h2>AI Assistant🤖</h2>
+            <div class="chat-header">
+                <h2>AI Assistant🤖</h2>
+                <button id="logout-btn" class="logout-btn" title="Log out">Log out</button>
+            </div>
             <div id="chat-history" class="chat-history-container">
             </div>
             <div class="input-area">
                 <textarea id="user-input" placeholder="Ask me anything..." rows="1" spellcheck="false"></textarea>
                 <button id="ask-btn" class="send-btn" title="Ask AI">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
+                    <svg class="ask-icon ask-icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M5 12h14"></path>
+                        <path d="M13 6l6 6-6 6"></path>
+                    </svg>
+                    <svg class="ask-icon ask-icon-spinner" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" opacity="0.25"></circle>
+                        <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></path>
                     </svg>
                 </button>
             </div>
@@ -73,6 +81,18 @@
     </div>
 
     <div id="auth-modal" class="modal-overlay">
+        <!-- Decorative S-curve wash (pink → violet → blue); not interactive -->
+        <svg class="auth-wave" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+                <linearGradient id="auth-wave-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#f472b6"></stop>
+                    <stop offset="48%" stop-color="#c084fc"></stop>
+                    <stop offset="100%" stop-color="#60a5fa"></stop>
+                </linearGradient>
+            </defs>
+            <path fill="url(#auth-wave-grad)" opacity="0.85"
+                d="M-5,78 C18,92 28,48 48,58 C68,68 78,22 105,32 L105,58 C82,48 72,88 52,78 C32,68 20,108 -5,95 Z"></path>
+        </svg>
         <div class="modal-content glass-panel auth-modal-content">
             <h2 id="auth-title">Login</h2>
 
