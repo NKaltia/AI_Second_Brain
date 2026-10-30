@@ -78,11 +78,18 @@ function openModal(note = null) {
     modalOverlay.classList.remove('hidden');
 }
 
+/** Markdown → HTML for display, then strip scripts/handlers (XSS). Never skip sanitize. */
+function renderSafeMarkdown(text) {
+    const rawHtml = marked.parse(text ?? '', { async: false });
+    return DOMPurify.sanitize(rawHtml);
+}
+
 function addMessageToChat(text, senderClass, sources = []) {
     const msgDiv = document.createElement('div');
     msgDiv.className = `${senderClass}`;
     if (senderClass === 'ai-message') {
-        msgDiv.innerHTML = marked.parse(text);
+        // Trusted path only after DOMPurify — model/note text is untrusted
+        msgDiv.innerHTML = renderSafeMarkdown(text);
 
         if (sources && sources.length > 0) {
             const sourcesDiv = document.createElement('div');
@@ -112,27 +119,39 @@ async function loadNotes() {
     try {
         const notesArray = await api.getNotes();
         const notesContainer = document.getElementById('notes-list');
-        notesContainer.innerHTML = '';
+        notesContainer.replaceChildren();
 
         notesArray.forEach(note => {
             const noteCard = document.createElement('div');
+            noteCard.className = 'note-card';
             noteCard.addEventListener('click', () => {
                 openModal(note);
             });
-            noteCard.className = 'note-card';
-            noteCard.innerHTML = `
-            <button class="delete-btn">✖</button>
-            <h3 style="margin-top:0;margin-bottom:5px;">${note.title}</h3>
-            <p class="note-preview">${note.content.split('\n')[0]}</p>
-            <small>${new Date(note.createdAt).toLocaleString()}</small>`;
 
-            const deleteBtn = noteCard.querySelector('.delete-btn');
+            // Build with textContent — titles/previews are data, not HTML templates
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = '✖';
             deleteBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 noteToDeleteId = note.id;
                 showConfirmModal();
             });
 
+            const titleEl = document.createElement('h3');
+            titleEl.style.marginTop = '0';
+            titleEl.style.marginBottom = '5px';
+            titleEl.textContent = note.title;
+
+            const previewEl = document.createElement('p');
+            previewEl.className = 'note-preview';
+            const firstLine = (note.content || '').split('\n')[0] || '';
+            previewEl.textContent = firstLine;
+
+            const dateEl = document.createElement('small');
+            dateEl.textContent = new Date(note.createdAt).toLocaleString();
+
+            noteCard.append(deleteBtn, titleEl, previewEl, dateEl);
             notesContainer.appendChild(noteCard);
         });
     } catch (err) {
