@@ -6,13 +6,19 @@ const api = {
         };
     },
 
+    /**
+     * @returns {Promise<*>}
+     * On failure throws Error with .status and optional .requestId (from error middleware).
+     */
     // requiresAuth: true → 401/403 means "session died, kick to login"
     // login/register also return 401 on bad credentials — must NOT look like session expiry
     async handleResponse(response, { requiresAuth = false } = {}) {
         if (requiresAuth && (response.status === 401 || response.status === 403)) {
             localStorage.removeItem('token');
             window.location.reload();
-            throw new Error('Session expired. Please log in again.');
+            const expired = new Error('Session expired. Please log in again.');
+            expired.status = response.status;
+            throw expired;
         }
 
         const contentType = response.headers.get('content-type');
@@ -20,8 +26,23 @@ const api = {
             ? await response.json()
             : null;
 
-        if (!response.ok) throw new Error(data?.error || data?.message || 'Request failed');
+        if (!response.ok) {
+            const err = new Error(data?.error || data?.message || 'Request failed');
+            err.status = response.status;
+            if (data?.requestId) err.requestId = data.requestId;
+            throw err;
+        }
         return data;
+    },
+
+    /** User-facing text: 5xx include request id when the server sent one. */
+    formatError(err) {
+        const status = err?.status;
+        const requestId = err?.requestId;
+        if (status >= 500 && requestId) {
+            return `Something went wrong. Error code: ${requestId}`;
+        }
+        return err?.message || 'Request failed';
     },
 
     async login(email, password) {

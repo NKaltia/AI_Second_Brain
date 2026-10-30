@@ -41,7 +41,8 @@ export class AuthService {
             user.id
         );
 
-        return { id: user.id, email: user.email };
+        // Same session shape as login — industry-common when email is not verified separately
+        return this.issueSession(user.id, user.email);
     }
 
     async login(data: AuthBody) {
@@ -60,7 +61,11 @@ export class AuthService {
             throw new AppError(401, 'Invalid email or password');
         }
 
-        const token = jwt.sign({ userId: user.id, email: user.email }, config.jwtSecret, { expiresIn: '24h' });
-        return { token, user: { id: user.id, email: user.email } };
+        return this.issueSession(user.id, user.email);
+    }
+
+    private issueSession(userId: string, email: string) {
+        const token = jwt.sign({ userId, email }, config.jwtSecret, { expiresIn: '24h' });
+        return { token, user: { id: userId, email } };
     }
 }

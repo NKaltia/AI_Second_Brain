@@ -22,8 +22,34 @@ const authPasswordInput = document.getElementById('auth-password');
 const authActionButton = document.getElementById('auth-action-btn');
 const authSwitchButton = document.getElementById('auth-switch-btn');
 const authConfirmPasswordInput = document.getElementById('auth-confirm-password');
+const authFormError = document.getElementById('auth-form-error');
+const noteFormError = document.getElementById('note-form-error');
+const toastEl = document.getElementById('toast');
 
 let isLoginMode = true;
+let toastTimer = null;
+
+function setFormError(el, message) {
+    if (!el) return;
+    if (!message) {
+        el.textContent = '';
+        el.classList.add('hidden');
+        return;
+    }
+    el.textContent = message;
+    el.classList.remove('hidden');
+}
+
+function showToast(message, { isError = false } = {}) {
+    if (!toastEl || !message) return;
+    toastEl.textContent = message;
+    toastEl.classList.toggle('toast-error', isError);
+    toastEl.classList.remove('hidden');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+        toastEl.classList.add('hidden');
+    }, 4500);
+}
 
 let currentEditingTags = [];
 let currentEditingNoteId = null;
@@ -75,6 +101,7 @@ function openModal(note = null) {
     renderModalTags();
     newTagInput.value = '';
     tagDropdown.classList.add('hidden');
+    setFormError(noteFormError, '');
     modalOverlay.classList.remove('hidden');
 }
 
@@ -191,8 +218,8 @@ askBtn.addEventListener('click', async () => {
     inputField.style.height = 'auto';
     addMessageToChat(text, 'user-message');
 
-    askBtn.innerHTML = "Thinking...";
     askBtn.disabled = true;
+    askBtn.classList.add('loading');
 
     try {
         const data = await api.askAI(text, chatHistoryContext);
@@ -205,13 +232,10 @@ askBtn.addEventListener('click', async () => {
         if (chatHistoryContext.length > 20) chatHistoryContext = chatHistoryContext.slice(-10);
 
     } catch (err) {
-        addMessageToChat("Error, ai-message");
+        showToast(api.formatError(err), { isError: true });
+        addMessageToChat(api.formatError(err), 'ai-message');
     } finally {
-        askBtn.innerHTML = `
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
-            </svg>
-        `;
+        askBtn.classList.remove('loading');
         askBtn.disabled = false;
     }
 });
@@ -243,11 +267,13 @@ modalSaveBtn.addEventListener('click', async () => {
     }
 
     if (!newContent || !newTitle) {
-        alert("Title and content can't be empty");
+        setFormError(noteFormError, "Title and content can't be empty");
         modalSaveBtn.innerText = "Save";
         modalSaveBtn.disabled = false;
         return;
     }
+
+    setFormError(noteFormError, '');
 
     try {
         await api.saveNote(currentEditingNoteId, newTitle, newContent, currentEditingTags);
@@ -256,7 +282,7 @@ modalSaveBtn.addEventListener('click', async () => {
         currentEditingNoteId = null;
         loadNotes();
     } catch (err) {
-        console.log(err);
+        setFormError(noteFormError, api.formatError(err));
     } finally {
         modalSaveBtn.innerText = "Save";
         modalSaveBtn.disabled = false;
@@ -307,13 +333,14 @@ confirmOkBtn.addEventListener('click', async () => {
             hideConfirmModal();
             loadNotes();
         } catch (err) {
-            console.error("Failed to delete note:", err);
+            showToast(api.formatError(err), { isError: true });
         }
     }
 });
 
 authSwitchButton.addEventListener('click', () => {
     isLoginMode = !isLoginMode;
+    setFormError(authFormError, '');
     authTitle.textContent = isLoginMode ? 'Log in' : 'Sign Up';
 
     if (isLoginMode) {
@@ -333,43 +360,43 @@ authActionButton.addEventListener('click', async () => {
     const password = authPasswordInput.value.trim();
 
     if (!email || !password) {
-        alert("Please enter email and password");
+        setFormError(authFormError, 'Please enter email and password');
         return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-        alert("Please enter a valid email address (e.g. user@gmail.com)");
+        setFormError(authFormError, 'Please enter a valid email address (e.g. user@gmail.com)');
         return;
     }
 
     if (!isLoginMode) {
         const confirmPassword = authConfirmPasswordInput.value.trim();
         if (password !== confirmPassword) {
-            alert("Passwords do not match");
+            setFormError(authFormError, 'Passwords do not match');
             return;
         }
     }
 
     if (!isLoginMode && password.length < 6) {
-        alert("Password must be at least 6 characters long.");
+        setFormError(authFormError, 'Password must be at least 6 characters long.');
         return;
     }
 
+    setFormError(authFormError, '');
+    authActionButton.disabled = true;
+
     try {
-        let data;
-        if (isLoginMode) {
-            data = await api.login(email, password);
-            localStorage.setItem('token', data.token);
-            checkAuth();
-        } else {
-            data = await api.register(email, password);
-            alert("Registration successful! Please log in.");
-            authSwitchButton.click();
-        }
+        const data = isLoginMode
+            ? await api.login(email, password)
+            : await api.register(email, password);
+
+        localStorage.setItem('token', data.token);
+        checkAuth();
     } catch (err) {
-        console.error("Auth error:", err);
-        alert(err.message || "An error occurred during authentication");
+        setFormError(authFormError, api.formatError(err));
+    } finally {
+        authActionButton.disabled = false;
     }
 });
 

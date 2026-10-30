@@ -70,7 +70,7 @@ Every checkbox should be deployable alone. Order = risk × CV value.
   - [ ] Smoke `/ask` locally and on Render after push
   - [ ] Separate dev Gemini API key (Google Cloud project)
 - [x] **2. 🔴 XSS.** PoC via note title/body → `alert`; fix: DOMPurify after `marked` for AI chat; note cards via `textContent` (no HTML templates). Re-test PoC after deploy/reload.
-- [ ] **3. UI without `alert()`.** Inline form errors + toasts; loading states; register → logged in; on 5xx show `requestId`.
+- [x] **3. UI without `alert()`.** Inline form errors + toasts; ask-btn loading animation; register returns session token (same as login); 5xx show `requestId`.
 - [ ] **4. 🔴 Architecture debt from 🎤 M2.** `AskService` orchestration; Zod for tool-call args (no `as any`); intent errors → pino `warn` + requestId (not silent swallow); remaining `console.*` → pino; AppError 4xx → `warn`, 5xx → `error`.
 - [ ] **5. 🔴 Rate limiting.** `/auth/*` and `/ask` → 429. Explain why in-memory limits fail with multiple instances.
 

@@ -267,6 +267,27 @@ body {
     transform: scale(1.1);
 }
 
+.send-btn.loading {
+    opacity: 0.55;
+    pointer-events: none;
+    animation: ask-pulse 1.1s ease-in-out infinite;
+}
+
+.send-btn.loading svg {
+    animation: ask-plane 1.4s ease-in-out infinite;
+}
+
+@keyframes ask-pulse {
+    0%, 100% { opacity: 0.45; }
+    50% { opacity: 0.75; }
+}
+
+@keyframes ask-plane {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    40% { transform: translate(3px, -2px) rotate(-8deg); }
+    70% { transform: translate(-1px, 1px) rotate(4deg); }
+}
+
 .send-btn:disabled {
     background: rgba(255, 255, 255, 0.1);
     cursor: not-allowed;
@@ -541,4 +562,44 @@ body {
 
 .hidden {
     display: none !important;
+}
+
+/* ==================== FORM ERRORS + TOAST ==================== */
+.form-error {
+    margin: 0 0 14px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    line-height: 1.35;
+    text-align: left;
+    color: #fecaca;
+    background: rgba(239, 68, 68, 0.18);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%);
+    z-index: 9999;
+    max-width: min(420px, calc(100vw - 32px));
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    line-height: 1.4;
+    color: #f8fafc;
+    background: rgba(15, 23, 42, 0.92);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.toast.toast-error {
+    border-color: rgba(239, 68, 68, 0.45);
+    background: rgba(69, 10, 10, 0.92);
+}
+
+.modal-save-btn.loading,
+#modal-save-btn:disabled {
+    opacity: 0.65;
 }
