@@ -227,8 +227,12 @@ askBtn.addEventListener('click', async () => {
         const data = await api.askAI(text, chatHistoryContext);
 
         if (data.newNoteSaved) loadNotes();
-        addMessageToChat(data.answer, 'ai-message', data.sources);
+        const displayAnswer = data.notice
+            ? `${data.answer}\n\n_${data.notice}_`
+            : data.answer;
+        addMessageToChat(displayAnswer, 'ai-message', data.sources);
         chatHistoryContext.push({ role: 'user', content: text });
+        // History keeps model text without the UI notice (avoid poisoning the next prompt)
         chatHistoryContext.push({ role: 'model', content: data.answer });
 
         if (chatHistoryContext.length > 20) chatHistoryContext = chatHistoryContext.slice(-10);

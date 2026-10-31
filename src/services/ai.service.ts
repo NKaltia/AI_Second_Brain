@@ -1,10 +1,19 @@
 import { GoogleGenAI, Type } from '@google/genai';
+import type { Logger } from 'pino';
 import { config } from '../config.js';
 import {
     GEMINI_CHAT_MODEL,
     GEMINI_EMBEDDING_DIMENSIONS,
     GEMINI_EMBEDDING_MODEL,
 } from '../gemini-models.js';
+import { intentResultSchema, saveNoteToolArgsSchema } from '../validation/schemas.js';
+import type { SaveNoteToolArgs } from '../validation/schemas.js';
+import { logger as rootLogger } from '../logger.js';
+
+export type GenerateAnswerResult = {
+    text: string;
+    newNoteData?: Pick<SaveNoteToolArgs, 'title' | 'content' | 'tags'>;
+};
 
 export class AIService {
     private ai = new GoogleGenAI({ apiKey: config.geminiApiKey });
@@ -15,10 +24,13 @@ export class AIService {
             contents: text,
             config: { taskType: taskType, outputDimensionality: GEMINI_EMBEDDING_DIMENSIONS }
         });
-        return (response as any).embeddings[0].values;
+        return (response as { embeddings: { values: number[] }[] }).embeddings[0]!.values;
     }
 
-    async analyzeIntentAndExpand(query: string): Promise<{ requiresSearch: boolean, expandedQuery: string }> {
+    /**
+     * May throw (Gemini / JSON / Zod). Caller decides graceful degradation.
+     */
+    async analyzeIntentAndExpand(query: string): Promise<{ requiresSearch: boolean; expandedQuery: string }> {
         const prompt = `You are the intent classifier for an AI Second Brain app.
         Your goal is to decide if the user's query requires searching the vector database.
         
@@ -34,29 +46,30 @@ export class AIService {
         
         User query: "${query}"`;
 
-        try {
-            const response = await this.ai.models.generateContent({
-                model: GEMINI_CHAT_MODEL,
-                contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                config: {
-                    responseMimeType: 'application/json',
-                    temperature: 0.1,
-                }
-            });
+        const response = await this.ai.models.generateContent({
+            model: GEMINI_CHAT_MODEL,
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            config: {
+                responseMimeType: 'application/json',
+                temperature: 0.1,
+            }
+        });
 
-            const parsed = JSON.parse(response.text || "{}");
-            return {
-                requiresSearch: !!parsed.requiresSearch,
-                expandedQuery: parsed.expandedQuery || ""
-            };
-        } catch (e) {
-            console.error("Failed to analyze intent:", e);
-            return { requiresSearch: false, expandedQuery: "" };
-        }
+        const parsed: unknown = JSON.parse(response.text || '{}');
+        const intent = intentResultSchema.parse(parsed);
+        return {
+            requiresSearch: intent.requiresSearch,
+            expandedQuery: intent.expandedQuery,
+        };
     }
 
-    async generateAnswer(question: string, contextNotes: string[], history: { role: string, content: string }[] = []): Promise<{ text: string, newNoteData?: any }> {
-        const contextText = contextNotes.length > 0 ? contextNotes.join('\n\n---\n\n') : "No information in the knowledge base";
+    async generateAnswer(
+        question: string,
+        contextNotes: string[],
+        history: { role: string; content: string }[] = [],
+        log: Logger = rootLogger
+    ): Promise<GenerateAnswerResult> {
+        const contextText = contextNotes.length > 0 ? contextNotes.join('\n\n---\n\n') : 'No information in the knowledge base';
         const saveNoteTool = {
             functionDeclarations: [
                 {
@@ -124,20 +137,26 @@ export class AIService {
         if (response.functionCalls && response.functionCalls.length > 0) {
             const call = response.functionCalls[0];
             if (call?.name === 'saveNote') {
-                const args = call.args as any;
+                const parsed = saveNoteToolArgsSchema.safeParse(call.args);
+                if (!parsed.success) {
+                    log.warn({ issues: parsed.error.issues }, 'saveNote tool args failed Zod validation');
+                    return {
+                        text: 'I tried to save a note but the data was invalid, so nothing was stored. Please try again.',
+                    };
+                }
+                const args = parsed.data;
                 return {
-                    text: args.messageToUser || 'Note saved!',
+                    text: args.messageToUser,
                     newNoteData: {
                         title: args.title,
                         content: args.content,
-                        tags: args.tags
-                    }
-                }
+                        tags: args.tags,
+                    },
+                };
             }
         }
         return {
             text: response.text || 'Error in response',
-
-        }
+        };
     }
 }

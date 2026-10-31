@@ -37,7 +37,7 @@ export class NoteService {
         const note = await this.getNoteById(userId, id);
         if(!note) throw new AppError(404, 'Note not found');
         await prisma.note.delete({
-            where: { userId, id }
+            where: { id }
         });
     }
 

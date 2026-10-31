@@ -27,7 +27,23 @@ export const askBodySchema = z.object({
     history: z.array(chatMessageSchema).max(40).optional().default([]),
 });
 
+/** LLM intent JSON — same trust boundary idea as req.body */
+export const intentResultSchema = z.object({
+    requiresSearch: z.boolean(),
+    expandedQuery: z.string().optional().default(''),
+});
+
+/** Arguments from Gemini function calling for saveNote — never trust `as any` */
+export const saveNoteToolArgsSchema = z.object({
+    messageToUser: z.string().trim().min(1).max(500),
+    title: z.string().trim().min(1).max(200),
+    content: z.string().min(1).max(50_000),
+    tags: z.array(z.string().trim().min(1).max(50)).max(20).default([]),
+});
+
 export type AuthBody = z.infer<typeof authBodySchema>;
 export type CreateNoteBody = z.infer<typeof createNoteBodySchema>;
 export type UpdateNoteBody = z.infer<typeof updateNoteBodySchema>;
 export type AskBody = z.infer<typeof askBodySchema>;
+export type SaveNoteToolArgs = z.infer<typeof saveNoteToolArgsSchema>;
+export type IntentResult = z.infer<typeof intentResultSchema>;
