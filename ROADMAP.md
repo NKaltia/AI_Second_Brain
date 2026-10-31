@@ -72,7 +72,7 @@ Every checkbox should be deployable alone. Order = risk × CV value.
 - [x] **2. 🔴 XSS.** PoC via note title/body → `alert`; fix: DOMPurify after `marked` for AI chat; note cards via `textContent` (no HTML templates). Re-test PoC after deploy/reload.
 - [x] **3. UI without `alert()`.** Inline form errors + toasts; ask-btn loading animation; register returns session token (same as login); 5xx show `requestId`.
 - [x] **4. 🔴 Architecture debt from 🎤 M2.** `AskService` orchestration; Zod for tool-call args + intent JSON; intent/search failure → degrade + `notice` + pino `warn` + requestId; ask-path `console.*` → pino; 4xx → `warn`, 5xx → `error`.
-- [ ] **5. 🔴 Rate limiting.** `/auth/*` and `/ask` → 429. Explain why in-memory limits fail with multiple instances.
+- [x] **5. 🔴 Rate limiting.** `express-rate-limit` on `/auth/*` (IP) and `/ask` (userId); 429 JSON; `trust proxy` for Render; in-memory OK for one instance (Redis later if scaled).
 
 ### Part 2 — Real auth (highest value)
 

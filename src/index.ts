@@ -9,6 +9,9 @@ import { errorMiddleware } from './middleware/error.middleware.js';
 
 const app = express();
 
+// Render (and most hosts) sit behind a reverse proxy — needed so rate-limit sees real client IPs
+app.set('trust proxy', 1);
+
 // Request ID + structured access logs (before routes so every request is correlated)
 app.use(
     pinoHttp({
