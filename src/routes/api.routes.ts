@@ -8,10 +8,13 @@ import * as healthController from '../controllers/health.controller.js';
 
 const router = Router();
 
-// Auth routes (public) — rate limit before bcrypt / DB work
+// Auth routes — rate limit before bcrypt / DB / refresh rotation
 router.get('/health', healthController.healthCheck);
 router.post('/auth/register', authRateLimiter, authController.register);
 router.post('/auth/login', authRateLimiter, authController.login);
+router.post('/auth/refresh', authRateLimiter, authController.refresh);
+router.post('/auth/logout', authController.logout);
+router.get('/auth/me', authMiddleware, authController.me);
 
 // Note routes (protected)
 router.get('/notes', authMiddleware, noteController.getAllNotes);

@@ -20,12 +20,24 @@ if (!parsed.success) {
     process.exit(1);
 }
 
+const nodeEnv = parsed.data.NODE_ENV;
+
+// Auth TTLs live here (not in .env): same values in every environment unless we later need ops knobs.
+const accessTokenTtlSeconds = 15 * 60; // 15 minutes
+const refreshTokenTtlMs = 30 * 24 * 60 * 60 * 1000; // 30 days
+
 export const config = {
     databaseUrl: parsed.data.DATABASE_URL,
     geminiApiKey: parsed.data.GEMINI_API_KEY,
     jwtSecret: parsed.data.JWT_SECRET,
     port: parsed.data.PORT,
-    nodeEnv: parsed.data.NODE_ENV,
+    nodeEnv,
+    accessTokenTtlSeconds,
+    refreshTokenTtlMs,
+    accessCookieName: 'access_token',
+    refreshCookieName: 'refresh_token',
+    // Secure cookies only over HTTPS — local http://localhost must stay false
+    cookieSecure: nodeEnv === 'production',
 };
 
 export type Config = typeof config;

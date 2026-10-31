@@ -393,12 +393,13 @@ authActionButton.addEventListener('click', async () => {
     authActionButton.disabled = true;
 
     try {
-        const data = isLoginMode
-            ? await api.login(email, password)
-            : await api.register(email, password);
-
-        localStorage.setItem('token', data.token);
-        checkAuth();
+        if (isLoginMode) {
+            await api.login(email, password);
+        } else {
+            await api.register(email, password);
+        }
+        // Session lives in HttpOnly cookies set by the server — nothing in localStorage
+        await checkAuth();
     } catch (err) {
         setFormError(authFormError, api.formatError(err));
     } finally {
@@ -407,29 +408,32 @@ authActionButton.addEventListener('click', async () => {
 });
 
 
-function checkAuth() {
-    const token = localStorage.getItem('token');
-    if (token) {
+async function checkAuth() {
+    try {
+        await api.me();
         authModal.classList.add('hidden');
         appContainer.classList.remove('hidden');
         loadNotes();
-    }
-    else {
+    } catch {
         // Hide the app shell so login is not a blur over notes/chat
         appContainer.classList.add('hidden');
         authModal.classList.remove('hidden');
     }
 }
 
-logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem('token');
+logoutBtn.addEventListener('click', async () => {
+    try {
+        await api.logout();
+    } catch {
+        // Still clear UI even if the network call failed
+    }
     chatHistoryContext = [];
     chatHistory.replaceChildren();
     setFormError(authFormError, '');
     authEmailInput.value = '';
     authPasswordInput.value = '';
     authConfirmPasswordInput.value = '';
-    checkAuth();
+    await checkAuth();
 });
 
 checkAuth();

@@ -1,4 +1,5 @@
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import { randomUUID } from 'node:crypto';
 import { pinoHttp } from 'pino-http';
 import type { IncomingMessage, ServerResponse } from 'node:http';
@@ -32,6 +33,7 @@ app.use(
 );
 
 app.use(express.json({ limit: '100kb' }));
+app.use(cookieParser());
 app.use(express.static('public'));
 
 app.use('/', apiRoutes);

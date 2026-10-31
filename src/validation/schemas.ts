@@ -5,6 +5,12 @@ export const authBodySchema = z.object({
     password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
+/** JWT access payload after verify — never trust `as { userId, email }` alone */
+export const accessTokenPayloadSchema = z.object({
+    userId: z.string().uuid(),
+    email: z.string().email(),
+});
+
 export const createNoteBodySchema = z.object({
     content: z.string().min(1, 'Content is required'),
     title: z.string().trim().min(1).max(200).optional(),
@@ -42,6 +48,7 @@ export const saveNoteToolArgsSchema = z.object({
 });
 
 export type AuthBody = z.infer<typeof authBodySchema>;
+export type AccessTokenPayload = z.infer<typeof accessTokenPayloadSchema>;
 export type CreateNoteBody = z.infer<typeof createNoteBodySchema>;
 export type UpdateNoteBody = z.infer<typeof updateNoteBodySchema>;
 export type AskBody = z.infer<typeof askBodySchema>;

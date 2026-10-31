@@ -17,11 +17,26 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  notes     Note[]
-  ChatHistory ChatMessage[]
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  notes         Note[]
+  ChatHistory   ChatMessage[]
+  refreshTokens RefreshToken[]
+}
+
+// One row = one refresh session (device/browser). Only the hash is stored — never the raw cookie value.
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  // Set when rotated or logged out. Reuse of a revoked token → revoke all for this user.
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
 }
 
 model ChatMessage {

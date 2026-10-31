@@ -78,7 +78,7 @@ Every checkbox should be deployable alone. Order = risk × CV value.
 
 Theory already covered in desktop Claude («JWT изнутри») — ask, don’t re-lecture from zero.
 
-- [ ] **6. 🔴 Cookies + access/refresh.** Access ~15m; refresh hashed in DB; httpOnly cookies; `/auth/refresh` with rotation + reuse detection; `/auth/logout`; frontend silent refresh on 401; drop `localStorage` token. Also: `algorithms: ['HS256']`; Zod JWT payload; constant-time login; register-409 → ADR. “Attack yourself”: old refresh after rotation revokes chain.
+- [x] **6. 🔴 Cookies + access/refresh.** Access ~15m; refresh hashed in DB; httpOnly cookies; `/auth/refresh` with rotation + reuse detection; `/auth/logout`; frontend silent refresh on 401; drop `localStorage` token. Also: `algorithms: ['HS256']`; Zod JWT payload; constant-time login; register-409 → ADR. “Attack yourself”: old refresh after rotation revokes chain. (ADR short note can land with §10 packaging.)
 - [ ] **7. 🔴 Google OAuth 2.0 (required, after §6).** Our access/refresh after Google login; Auth Code + `state` (+ PKCE 🟡); verify ID token; Cloud Console redirect URIs; secrets via `config` / `.env.example`. ADR: linking Google email to existing password account. Schema: nullable `password`, `googleId` via expand → migrate → contract (check `DATABASE_URL` first).
 - [ ] **8. Guest “Try demo”** — only if time left. Per-visitor temp account with seed notes (not one shared account).
 
