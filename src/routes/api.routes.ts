@@ -2,19 +2,22 @@ import { Router } from 'express';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { askRateLimiter, authRateLimiter } from '../middleware/rateLimit.middleware.js';
 import * as authController from '../controllers/auth.controller.js';
+import * as oauthController from '../controllers/oauth.controller.js';
 import * as noteController from '../controllers/note.controller.js';
 import * as aiController from '../controllers/ai.controller.js';
 import * as healthController from '../controllers/health.controller.js';
 
 const router = Router();
 
-// Auth routes — rate limit before bcrypt / DB / refresh rotation
+// Auth routes — rate limit before bcrypt / DB / refresh rotation / OAuth start
 router.get('/health', healthController.healthCheck);
 router.post('/auth/register', authRateLimiter, authController.register);
 router.post('/auth/login', authRateLimiter, authController.login);
 router.post('/auth/refresh', authRateLimiter, authController.refresh);
 router.post('/auth/logout', authController.logout);
 router.get('/auth/me', authMiddleware, authController.me);
+router.get('/auth/google', authRateLimiter, oauthController.googleStart);
+router.get('/auth/google/callback', authRateLimiter, oauthController.googleCallback);
 
 // Note routes (protected)
 router.get('/notes', authMiddleware, noteController.getAllNotes);

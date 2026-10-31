@@ -61,15 +61,56 @@ export class AuthService {
             where: { email: data.email },
         });
 
+        // Google-only users have password = null — still run bcrypt against a dummy hash (timing).
         const passwordHash = user?.password ?? DUMMY_PASSWORD_HASH;
         const isPasswordValid = await bcrypt.compare(data.password, passwordHash);
 
         // Same message for unknown email and wrong password — prevents user enumeration
-        if (!user || !isPasswordValid) {
+        if (!user || !user.password || !isPasswordValid) {
             throw new AppError(401, 'Invalid email or password');
         }
 
         return this.issueSession(user.id, user.email);
+    }
+
+    /**
+     * After Google verified the ID token: find by googleId, else link/create by email (ADR 002).
+     */
+    async loginWithGoogle(profile: { googleId: string; email: string }): Promise<IssuedSession> {
+        const byGoogle = await prisma.user.findUnique({
+            where: { googleId: profile.googleId },
+        });
+        if (byGoogle) {
+            return this.issueSession(byGoogle.id, byGoogle.email);
+        }
+
+        const byEmail = await prisma.user.findUnique({
+            where: { email: profile.email },
+        });
+        if (byEmail) {
+            const linked = await prisma.user.update({
+                where: { id: byEmail.id },
+                data: { googleId: profile.googleId },
+            });
+            return this.issueSession(linked.id, linked.email);
+        }
+
+        const created = await prisma.user.create({
+            data: {
+                email: profile.email,
+                googleId: profile.googleId,
+                password: null,
+            },
+        });
+
+        await this.noteService.addNote(
+            WELCOME_NOTE_TITLE,
+            WELCOME_NOTE_CONTENT,
+            WELCOME_NOTE_TAGS,
+            created.id
+        );
+
+        return this.issueSession(created.id, created.email);
     }
 
     /**

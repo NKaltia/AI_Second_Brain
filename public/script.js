@@ -436,4 +436,9 @@ logoutBtn.addEventListener('click', async () => {
     await checkAuth();
 });
 
+if (new URLSearchParams(window.location.search).get('oauth') === 'error') {
+    showToast('Google sign-in failed. Try again or use email.', { isError: true });
+    window.history.replaceState({}, '', '/');
+}
+
 checkAuth();

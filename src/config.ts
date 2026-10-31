@@ -7,6 +7,11 @@ const envSchema = z.object({
     JWT_SECRET: z.string().min(32, 'must be at least 32 characters'),
     PORT: z.coerce.number().int().positive().default(3000),
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+    // Public URL of this app (no trailing slash). Used as OAuth redirect base.
+    APP_BASE_URL: z.string().url().default('http://localhost:3000'),
+    // Optional until Google Cloud OAuth client is created — /auth/google returns 503 if missing.
+    GOOGLE_CLIENT_ID: z.string().min(1).optional(),
+    GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -26,16 +31,24 @@ const nodeEnv = parsed.data.NODE_ENV;
 const accessTokenTtlSeconds = 15 * 60; // 15 minutes
 const refreshTokenTtlMs = 30 * 24 * 60 * 60 * 1000; // 30 days
 
+const googleClientId = parsed.data.GOOGLE_CLIENT_ID;
+const googleClientSecret = parsed.data.GOOGLE_CLIENT_SECRET;
+
 export const config = {
     databaseUrl: parsed.data.DATABASE_URL,
     geminiApiKey: parsed.data.GEMINI_API_KEY,
     jwtSecret: parsed.data.JWT_SECRET,
     port: parsed.data.PORT,
     nodeEnv,
+    appBaseUrl: parsed.data.APP_BASE_URL.replace(/\/$/, ''),
+    googleClientId,
+    googleClientSecret,
+    googleOAuthEnabled: Boolean(googleClientId && googleClientSecret),
     accessTokenTtlSeconds,
     refreshTokenTtlMs,
     accessCookieName: 'access_token',
     refreshCookieName: 'refresh_token',
+    oauthStateCookieName: 'oauth_state',
     // Secure cookies only over HTTPS — local http://localhost must stay false
     cookieSecure: nodeEnv === 'production',
 };

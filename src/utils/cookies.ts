@@ -27,3 +27,17 @@ export function clearAuthCookies(res: Response): void {
         ...baseCookieOptions,
     });
 }
+
+/** Short-lived CSRF marker for the Google OAuth round-trip. */
+export function setOAuthStateCookie(res: Response, state: string): void {
+    res.cookie(config.oauthStateCookieName, state, {
+        ...baseCookieOptions,
+        maxAge: 10 * 60 * 1000,
+    });
+}
+
+export function clearOAuthStateCookie(res: Response): void {
+    res.clearCookie(config.oauthStateCookieName, {
+        ...baseCookieOptions,
+    });
+}

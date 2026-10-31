@@ -19,7 +19,9 @@ datasource db {
 model User {
   id            String         @id @default(uuid())
   email         String         @unique
-  password      String
+  // Null for Google-only accounts. App invariant: password != null OR googleId != null.
+  password      String?
+  googleId      String?        @unique
   notes         Note[]
   ChatHistory   ChatMessage[]
   refreshTokens RefreshToken[]
