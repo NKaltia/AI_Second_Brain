@@ -1,6 +1,7 @@
 import type { Logger } from 'pino';
 import type { Note } from '../interfaces/note.interface.js';
 import { logger as rootLogger } from '../logger.js';
+import { NOTES_SEARCH_NOTICE } from '../utils/prompts.js';
 import { AIService } from './ai.service.js';
 import { NoteService } from './note.service.js';
 
@@ -22,9 +23,6 @@ export type AskResult = {
     /** Short human-facing explanation when notesSearchSkipped */
     notice?: string;
 };
-
-const NOTES_SEARCH_NOTICE =
-    "I couldn't search your notes this time, so this answer isn't based on them.";
 
 /**
  * Use-case / application service for POST /ask.
