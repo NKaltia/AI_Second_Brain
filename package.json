@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "build": "npx prisma generate && npx prisma migrate deploy && tsc",
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts"
@@ -22,9 +23,12 @@
   },
   "homepage": "https://github.com/NegativeOne36/AI_Second_Brain#readme",
   "devDependencies": {
+    "@types/supertest": "^7.2.1",
     "nodemon": "^3.1.14",
+    "supertest": "^7.3.1",
     "ts-node": "^10.9.2",
-    "tsx": "^4.21.0"
+    "tsx": "^4.21.0",
+    "vitest": "^5.0.5"
   },
   "dependencies": {
     "@google/genai": "^1.44.0",

@@ -7,5 +7,10 @@ import { config } from './config.js';
  * In development: still JSON by default; add pino-pretty for colors.
  */
 export const logger = pino({
-    level: config.nodeEnv === 'production' ? 'info' : 'debug',
+    level:
+        config.nodeEnv === 'test'
+            ? 'silent'
+            : config.nodeEnv === 'production'
+              ? 'info'
+              : 'debug',
 });

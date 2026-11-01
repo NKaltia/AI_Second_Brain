@@ -79,12 +79,12 @@ Every checkbox should be deployable alone. Order = risk × CV value.
 Theory already covered in desktop Claude («JWT изнутри») — ask, don’t re-lecture from zero.
 
 - [x] **6. 🔴 Cookies + access/refresh.** Access ~15m; refresh hashed in DB; httpOnly cookies; `/auth/refresh` with rotation + reuse detection; `/auth/logout`; frontend silent refresh on 401; drop `localStorage` token. Also: `algorithms: ['HS256']`; Zod JWT payload; constant-time login; register-409 → ADR. “Attack yourself”: old refresh after rotation revokes chain. (ADR short note can land with §10 packaging.)
-- [ ] **7. 🔴 Google OAuth 2.0 (required, after §6).** Our access/refresh after Google login; Auth Code + `state` (+ PKCE 🟡); verify ID token; Cloud Console redirect URIs; secrets via `config` / `.env.example`. ADR: linking Google email to existing password account. Schema: nullable `password`, `googleId` via expand → migrate → contract (check `DATABASE_URL` first).
+- [x] **7. 🔴 Google OAuth 2.0 (required, after §6).** Our access/refresh after Google login; Auth Code + `state` (+ PKCE 🟡); verify ID token; Cloud Console redirect URIs; secrets via `config` / `.env.example`. ADR: linking Google email to existing password account. Schema: nullable `password`, `googleId` via expand → migrate → contract (check `DATABASE_URL` first). Prod: `APP_BASE_URL` + redirect URI `/auth/google/callback`; `migrate deploy` in build.
 - [ ] **8. Guest “Try demo”** — only if time left. Per-visitor temp account with seed notes (not one shared account).
 
 ### Part 3 — Packaging and freeze
 
-- [ ] **9. Tests + CI.** Vitest + supertest (auth refresh/reuse, notes 404, 400/413; Gemini mocked). GitHub Actions: `tsc` + tests.
+- [x] **9. Tests + CI.** Vitest + supertest (auth refresh/reuse, notes 404, 400/413; Gemini avoided via direct user seed). GitHub Actions: `tsc` + tests + pgvector service. App factory `createApp()` for listen-free tests.
 - [ ] **10. README + ADRs.** Honest README (query expansion ≠ HyDE; architecture; Security; cold start). ADRs: refresh vs sessions; OAuth account linking; model choice / keep embeddings.
 - [ ] **11. Freeze checklist.** Full `.env.example`; Render Health Check Path `/health`; no soon-deprecated models; free-tier limits checked; manual demo path register → ask.
 - [ ] **12. 🎤 Final review** (desktop Claude) + CV bullets + pitch. Agent writes interviewer summary in Notion «Где мы сейчас» first.
