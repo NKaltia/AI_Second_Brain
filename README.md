@@ -1,19 +1,20 @@
 # AI Second Brain
 
-An intelligent knowledge management system built with Node.js and PostgreSQL. It uses RAG (Retrieval-Augmented Generation) and semantic vector search to act as an extension of your own mind. 
+Personal notes app with a chat assistant grounded in **your** notes via RAG (Retrieval-Augmented Generation): Gemini embeddings, PostgreSQL + `pgvector`, and an Express/TypeScript API.
 
 ## Live Demo
 
 👉 [Open AI Second Brain](https://ai-second-brain-4cv0.onrender.com/)
 
-_The app is hosted on Render free tier, so the server may take ~20–30 seconds to wake up on first load._
+Hosted on **Render free tier** — the first request after idle can take **~30–60 seconds** (cold start). Prefer email/password or Google sign-in after the service wakes.
 
 ## Key Capabilities
-- **Semantic Retrieval (RAG):** Powered by `pgvector` and Google Gemini embeddings to find information based on context and meaning rather than keywords.
-- **Dynamic Query Expansion:** An LLM step classifies query intent and expands the query with related terms before vector search (Currently testing HyDE system).
-- **Note Capture via Function Calling:** The AI can create and save notes directly from the chat when the user asks it to.
-- **Secure Authentication:** Protected user access with JWT (JSON Web Tokens) and secure password hashing.
-- **Modern UI:** Responsive, minimalist glassmorphism interface for focused knowledge work.
+
+- **Semantic retrieval (RAG):** `pgvector` cosine search scoped per user; embeddings from Gemini (`gemini-embedding-001`, 768 dims).
+- **Intent + query expansion:** an LLM step decides whether search is needed and rewrites the query before vector search. **This is not HyDE** (Hypothetical Document Embeddings). Real HyDE is explicitly out of scope until after the MVP freeze.
+- **Note capture via function calling:** the model can call `saveNote`; the **server** executes it (user id from the session, never from model args).
+- **Auth:** email/password + **Google OAuth**; short-lived **access JWT** and **refresh** tokens in **httpOnly** cookies (refresh hashed in DB, rotation + reuse detection).
+- **Hardening for a public demo:** Zod validation, centralized errors, rate limits on auth/`/ask`, XSS sanitization (DOMPurify / `textContent`), CI on GitHub Actions.
 
 ---
 
@@ -21,12 +22,12 @@ _The app is hosted on Render free tier, so the server may take ~20–30 seconds 
 
 ### Video Walkthrough
 
-
 https://github.com/user-attachments/assets/51ce94e2-e0f7-4a91-935d-01f7b144f59e
 
 *A demonstration of the AI assistant creating and retrieving notes during a natural dialogue.*
 
 ### Screenshot Gallery
+
 | Main Dashboard | Note Editor |
 |---|---|
 | ![Main Dashboard](assets/main-dashboard.png) | ![Note Editor](assets/note-editor.png) |
@@ -36,76 +37,103 @@ https://github.com/user-attachments/assets/51ce94e2-e0f7-4a91-935d-01f7b144f59e
 ## Tech Stack & Architecture
 
 ### Technologies
-- **Backend:** Node.js, Express, TypeScript
-- **Frontend:** Vanilla JavaScript (ES6+), HTML5, CSS3 (Glassmorphism)
-- **Database:** Serverless PostgreSQL (Neon DB) with `pgvector` extension
-- **ORM:** Prisma
-- **AI Models:** Google Gemini 3.1 Flash Lite Preview (Generation) & Gemini Embedding 001 (Embeddings) via `@google/genai` SDK
-- **Security:** JWT, bcryptjs
 
-### Project Structure (Layered Architecture)
-The application follows a standard layered architectural pattern to ensure separation of concerns:
-- `Controllers` - Handle incoming HTTP requests and send responses.
-- `Services` - Contain the core business logic (e.g., AI inference, Authentication, Note management).
-- `Middleware` - Intercept requests for JWT validation and route protection.
-- `Database (Prisma)` - Abstracted data access layer managing PostgreSQL interactions.
+- **Backend:** Node.js, Express 5, TypeScript (ESM), `tsx` in development
+- **Frontend:** Vanilla JS / HTML / CSS in `public/`
+- **Database:** PostgreSQL + `pgvector` (local Docker Compose; production **Neon**)
+- **ORM:** Prisma 7
+- **AI:** Google Gemini via `@google/genai` — chat `gemini-3.5-flash-lite`, embeddings `gemini-embedding-001` (see [ADR 001](docs/adr/001-gemini-models.md))
+- **Auth:** JWT (HS256) + bcryptjs; Google OAuth (`google-auth-library`); cookies via `cookie-parser`
+- **Ops:** pino logging + request IDs, `GET /health`, Vitest + Supertest, GitHub Actions CI
+
+### Layered layout
+
+```
+browser → routes → controllers → services → Prisma / Gemini
+                 ↘ middleware (auth, rate limit)
+```
+
+- **Controllers** — HTTP only (parse, status, cookies/redirects).
+- **Services** — business logic (`AskService` orchestrates `/ask`; auth/oauth/notes/AI have no `req`/`res`).
+- **Middleware** — JWT from access cookie, rate limits, errors.
+
+Architecture notes: [ADR 002](docs/adr/002-google-account-linking.md) (Google ↔ password account), [ADR 003](docs/adr/003-refresh-tokens-vs-sessions.md) (access/refresh vs sessions).
+
+---
+
+## Security (short)
+
+| Topic | Approach |
+|---|---|
+| Passwords | bcrypt; same error for unknown email / wrong password |
+| Tokens | httpOnly cookies; access ~15m; refresh hashed + rotatable |
+| XSS | DOMPurify after `marked` for AI HTML; note UI via `textContent` |
+| Abuse | rate limit on `/auth/*` and `/ask` |
+| Config | Zod-validated env at startup (fail fast); secrets not in git |
 
 ---
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js (v18+)
-- PostgreSQL (with `pgvector` extension enabled) or a Neon DB instance
-- Google Gemini API Key
 
-### Local Installation
+- Node.js 18+
+- Docker (recommended) for local Postgres + pgvector, **or** any Postgres with `vector`
+- Gemini API key
+- Optional: Google OAuth client for “Continue with Google”
 
-1. **Clone the repository:**
+### Local setup
+
+1. **Clone**
    ```bash
    git clone https://github.com/NKaltia/AI_Second_Brain.git
    cd AI_Second_Brain
    ```
 
-2. **Install dependencies:**
+2. **Install**
    ```bash
    npm install
    ```
 
-3. **Configure environment:**
-   Create a `.env` file in the root directory. You will need a secret key for JWT authentication and your database/AI credentials:
-   ```env
-   # Database Configuration (Neon DB or Local PostgreSQL)
-   DATABASE_URL="your-postgresql-url"
-   
-   # AI Configuration
-   GEMINI_API_KEY="your-gemini-api-key"
-   
-   # Security
-   JWT_SECRET="your-secure-jwt-secret-key"
-   PORT=3000
-   ```
-
-4. **Initialize database:**
-   Synchronize your Prisma schema with the database:
+3. **Database**
    ```bash
-   npx prisma db push
+   docker compose up -d
+   ```
+   Copy `.env.example` → `.env` and fill secrets. Local `DATABASE_URL` should point at Docker, **not** production Neon.
+
+4. **Migrate + generate**
+   ```bash
+   npx prisma migrate deploy
+   npx prisma generate
    ```
 
-5. **Start developing:**
-   Run the development server (uses `tsx` for TypeScript execution):
+5. **Run**
    ```bash
    npm run dev
    ```
+   App: [http://localhost:3000](http://localhost:3000)
+
+### Useful commands
+
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Dev server with reload |
+| `npx tsc --noEmit` | Typecheck |
+| `npm test` | Vitest HTTP tests (needs local DB) |
+| `npx prisma migrate dev --name <name>` | New migration (dev only) |
 
 ---
 
 ## Deployment
-The application is designed to be cloud-native:
-- **Backend API & Static Files:** Deployed on **Render**.
-- **Database:** Hosted on **Neon DB**, utilizing its serverless Postgres architecture with native support for `pgvector`.
+
+- **Render** — build runs `prisma generate`, `prisma migrate deploy`, `tsc`; start `npm start`.
+- **Neon** — production database (`DATABASE_URL` in Render env).
+- Set `APP_BASE_URL` to the public HTTPS origin and register  
+  `{APP_BASE_URL}/auth/google/callback` in Google Cloud OAuth clients.
+- Prefer **Auto-Deploy: After CI Checks Pass** so a red GitHub Actions run does not ship.
 
 ---
 
 ## Contact
-Developed by [Nikita Kaltia] – [https://github.com/NKaltia]
+
+Developed by [Nikita Kaltia](https://github.com/NKaltia)

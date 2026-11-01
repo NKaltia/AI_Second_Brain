@@ -85,7 +85,7 @@ Theory already covered in desktop Claude («JWT изнутри») — ask, don�
 ### Part 3 — Packaging and freeze
 
 - [x] **9. Tests + CI.** Vitest + supertest (auth refresh/reuse, notes 404, 400/413; Gemini avoided via direct user seed). GitHub Actions: `tsc` + tests + pgvector service. App factory `createApp()` for listen-free tests.
-- [ ] **10. README + ADRs.** Honest README (query expansion ≠ HyDE; architecture; Security; cold start). ADRs: refresh vs sessions; OAuth account linking; model choice / keep embeddings.
+- [x] **10. README + ADRs.** Honest README (query expansion ≠ HyDE; architecture; Security; cold start). ADRs: refresh vs sessions (003); OAuth account linking (002); model choice / keep embeddings (001).
 - [ ] **11. Freeze checklist.** Full `.env.example`; Render Health Check Path `/health`; no soon-deprecated models; free-tier limits checked; manual demo path register → ask.
 - [ ] **12. 🎤 Final review** (desktop Claude) + CV bullets + pitch. Agent writes interviewer summary in Notion «Где мы сейчас» first.
 
